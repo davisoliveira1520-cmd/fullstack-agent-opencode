@@ -65,6 +65,18 @@ Then you're exactly who this was designed around. If you set up a memory vault, 
 
 Built on the free and open work of **Jared Rhodenizer** ([jaredrhod/fullstack-agent](https://github.com/jaredrhod/fullstack-agent)), adapted to run on **OpenCode** ([anomalyco/opencode](https://github.com/anomalyco/opencode)) in place of Claude Code. Community, videos, and Discord: https://jaredrhod.com
 
+## OpenJarvis
+
+Em `openjarvis/` está o **[OpenJarvis](https://github.com/open-jarvis/OpenJarvis)** (Stanford / Hazy Research) — framework Python para IA pessoal local-first, Apache 2.0:
+
+```bash
+jarvis                          # start chatting
+jarvis init --preset <name> --force
+jarvis doctor                   # status
+```
+
+Skills, agentes built-in (morning_digest, deep_research, orchestrator, code-assistant etc.), docs e tutoriais: https://open-jarvis.github.io/OpenJarvis/
+
 ## License
 
 Copyright (c) 2026 Jared Rhodenizer. Licensed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later), which this adaptation also carries.
