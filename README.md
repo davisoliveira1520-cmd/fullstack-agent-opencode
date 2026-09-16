@@ -107,6 +107,20 @@ npm run dev        # web UI (assistente de apps)
 
 Pergunte ao Jarvis (falando): "crie um app com a cópia do Lovable" — ele usa esta pasta para gerar a aplicação.
 
+## Codex
+
+Em `codex/` está o **[Codex](https://github.com/openai/codex)** — o agente de codificação terminal-first da OpenAI (Rust), com modo de supervisão CLI/TUI, auto-continue, voice e execução em sandbox Docker:
+
+```bash
+npm install -g @openai/codex
+codex          # TUI com chat e supervisor
+codex exec     # modo CLI/automação
+codex --voice  # entrada por fala (requer microfone)
+```
+
+USO: https://developers.openai.com/codex/
+Licença: Apache-2.0 (ver `codex/LICENSE`)
+
 ## License
 
 Copyright (c) 2026 Jared Rhodenizer. Licensed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later), which this adaptation also carries.
