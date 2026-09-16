@@ -77,6 +77,42 @@ jarvis doctor                   # status
 
 Skills, agentes built-in (morning_digest, deep_research, orchestrator, code-assistant etc.), docs e tutoriais: https://open-jarvis.github.io/OpenJarvis/
 
+## OpenClaw
+
+Em `openclaw/` está o **[OpenClaw](https://github.com/openclaw/openclaw)** — assistente de IA open-source que roda na sua máquina e atende nos canais que você já usa (Discord, iMessage, Slack, Teams, Telegram, WhatsApp, +20), com apps nativos e Gateway local (MIT):
+
+```bash
+npm install -g openclaw@latest --allow-scripts=openclaw
+openclaw onboard --install-daemon
+openclaw gateway status
+openclaw dashboard
+```
+
+Docs, modelos, skills e plugins: https://docs.openclaw.ai
+
+## Claude Code
+
+Em `claude-code/` está o **[Claude Code](https://github.com/anthropics/claude-code)** — o agente de codificação da Anthropic (terminal):
+
+```bash
+npm install -g @anthropic-ai/claude-code
+claude
+```
+
+USO: https://docs.anthropic.com/en/docs/claude-code
+Politica comercial / licença: https://www.anthropic.com/legal/commercial-terms
+
+## Open-Lovable
+
+Em `open-lovable/` está o **[Open-Lovable](https://github.com/firecrawl/open-lovable)** — uma recriação open-source do Lovable: crie, clone e recrie apps com IA a partir de uma conversa (copie um site existente e faça o Jarvis reconstruí-lo):
+
+```bash
+npm install
+npm run dev        # web UI (assistente de apps)
+```
+
+Pergunte ao Jarvis (falando): "crie um app com a cópia do Lovable" — ele usa esta pasta para gerar a aplicação.
+
 ## License
 
 Copyright (c) 2026 Jared Rhodenizer. Licensed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later), which this adaptation also carries.
