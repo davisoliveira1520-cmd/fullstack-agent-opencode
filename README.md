@@ -31,6 +31,16 @@ $d="$env:USERPROFILE\.local\bin"; if (Test-Path "$d\opencode.exe") { $env:Path="
 
 Depois do download, é só **duplo-clique em `jarvis.bat`** (Windows). Ele extrai o OpenCode para `bin\` e abre o Jarvis falando com você. No macOS/Linux: `chmod +x jarvis.sh && ./jarvis.sh`.
 
+**Instalação oficial:**
+
+```
+winget install davisoliveira1520-cmd.Jarvis        # Windows
+brew tap davisoliveira1520-cmd/jarvis              # macOS / Linux
+brew install jarvis
+```
+
+Os manifests de publicação estão em `dist/winget/` (PR para microsoft/winget-pkgs) e a formula em `brew/jarvis.rb`.
+
 OpenCode abre com o instalador já conversando com você. Tudo depois disso é conversa: ele pergunta o nome e a personalidade do seu agente (ou entrega o meu, Jarvis, pronto para usar), quais peças você quer e onde suas notas vivem. Ele mesmo faz o instalar, o configurar e o ligar isso tudo.
 
 ## Already built some of this?
