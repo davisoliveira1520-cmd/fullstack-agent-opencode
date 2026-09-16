@@ -21,23 +21,17 @@ Every piece is optional. The wizard asks which ones you want and explains each i
 
 ## Install
 
-You need [OpenCode](https://opencode.ai) with a model provider signed in (`opencode auth login`). Mac and Linux also use git (macOS offers to install it the first time you use it). Windows needs nothing else: the installer sets up git for you during setup. Then one paste into your terminal.
+**O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code, o OpenClaw, o Open-Lovable e o OpenJarvis. Nada se instala no seu PC além de descompactar esta pasta — o próprio Jarvis cuida do resto.
 
-Mac and Linux:
-
-```
-mkdir -p ~/my-agent && cd ~/my-agent && git clone https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode && cd fullstack-agent-opencode && opencode "set me up"
-```
-
-Windows (PowerShell):
+**Windows (PowerShell):** baixa o toolbox e abre o Jarvis. Ele descompacta o OpenCode da pasta `bin\` e inicia o assistente de setup:
 
 ```
-$d="$env:USERPROFILE\.local\bin"; if (Test-Path "$d\opencode.exe") { $env:Path="$d;$env:Path" }; New-Item -ItemType Directory -Force -Path $HOME\my-agent | Out-Null; cd $HOME\my-agent; if (-not (Test-Path fullstack-agent\fullstack-agent.md)) { Invoke-WebRequest https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode/archive/refs/heads/main.zip -OutFile fsa.zip; Expand-Archive fsa.zip . -Force; New-Item -ItemType Directory -Force -Path fullstack-agent | Out-Null; Get-ChildItem fullstack-agent-opencode-main -Force | Copy-Item -Destination fullstack-agent -Recurse -Force; Remove-Item fullstack-agent-opencode-main -Recurse -Force; Remove-Item fsa.zip }; cd fullstack-agent; if (Get-Command opencode -ErrorAction SilentlyContinue) { opencode "set me up" } else { Write-Output "OpenCode is not installed yet. Install it first at https://opencode.ai then paste this again." }
+$d="$env:USERPROFILE\.local\bin"; if (Test-Path "$d\opencode.exe") { $env:Path="$d;$env:Path" }; New-Item -ItemType Directory -Force -Path $HOME\jarvis | Out-Null; cd $HOME\jarvis; if (-not (Test-Path jarvis.bat)) { Invoke-WebRequest https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode/archive/refs/heads/main.zip -OutFile jarvis.zip; Expand-Archive jarvis.zip . -Force; New-Item -ItemType Directory -Force -Path jarvis | Out-Null; Get-ChildItem fullstack-agent-opencode-main -Force | Copy-Item -Destination jarvis -Recurse -Force; Remove-Item fullstack-agent-opencode-main -Recurse -Force; Remove-Item jarvis.zip }; cd jarvis
 ```
 
-(The Windows command downloads the toolbox as a zip on purpose, so it works on a machine with no git installed. The installer sets up git for you during setup. Safe to paste as many times as you like: it skips the download when the toolbox is already there, and if an earlier attempt died partway and left a half-finished folder, it downloads again and finishes the job rather than assuming it was already done.)
+Depois do download, é só **duplo-clique em `jarvis.bat`** (Windows). Ele extrai o OpenCode para `bin\` e abre o Jarvis falando com você. No macOS/Linux: `chmod +x jarvis.sh && ./jarvis.sh`.
 
-OpenCode opens with the installer already talking to you. Everything after that is a conversation: it asks for your agent's name and personality (or hands you mine, Jarvis, ready to use), which pieces you want, and where your notes live. It does the installing, the configuring, and the wiring itself.
+OpenCode abre com o instalador já conversando com você. Tudo depois disso é conversa: ele pergunta o nome e a personalidade do seu agente (ou entrega o meu, Jarvis, pronto para usar), quais peças você quer e onde suas notas vivem. Ele mesmo faz o instalar, o configurar e o ligar isso tudo.
 
 ## Already built some of this?
 

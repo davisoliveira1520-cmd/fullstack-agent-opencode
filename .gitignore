@@ -8,3 +8,8 @@ build/
 .env
 .env.local
 *.log
+
+# Jarvis bundled OpenCode extract (zip is tracked; the unpacked binary is not)
+bin/*.exe
+bin/opencode
+tmp/
