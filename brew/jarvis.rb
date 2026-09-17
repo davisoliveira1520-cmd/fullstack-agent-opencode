@@ -8,7 +8,6 @@ class Jarvis < Formula
   depends_on "bash"
 
   def install
-    bin.install Dir["jarvis.bat"] if OS.windows?
     bin.install "jarvis.sh"
   end
 
@@ -16,7 +15,8 @@ class Jarvis < Formula
     <<~EOS
       Run Jarvis with:
         jarvis.sh
-      (Windows: open the jarvis.bat in #{bin})
+
+      First run downloads the OpenCode binary into ~/.cache/jarvis
     EOS
   end
 
