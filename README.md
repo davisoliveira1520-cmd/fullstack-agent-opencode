@@ -39,7 +39,48 @@ brew tap davisoliveira1520-cmd/jarvis              # macOS / Linux
 brew install jarvis
 ```
 
-Os manifests de publicação estão em `dist/winget/` (PR para microsoft/winget-pkgs) e a formula em `brew/jarvis.rb`.
+Os manifests de publicação estão em `packaging/winget/` (PR para microsoft/winget-pkgs) e a formula em `brew/jarvis.rb`.
+
+## Instalar por plataforma (terminal)
+
+**Windows (PowerShell ou Prompt):** baixa o repo, descompacta o OpenCode embutido em `bin\` e abre o Jarvis:
+
+```powershell
+winget install davisoliveira1520-cmd.Jarvis   # após aprovação do PR
+# ou manual (funciona já):
+git clone --depth 1 https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode.git jarvis
+cd jarvis
+.\jarvis.bat
+```
+
+**macOS:**
+
+```bash
+brew tap davisoliveira1520-cmd/jarvis && brew install jarvis && jarvis.sh
+# ou manual:
+git clone --depth 1 https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode.git jarvis
+cd jarvis && chmod +x jarvis.sh && ./jarvis.sh
+```
+
+**Linux (Debian/Ubuntu etc.):**
+
+```bash
+sudo apt install curl unzip -y
+git clone --depth 1 https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode.git jarvis
+cd jarvis && chmod +x jarvis.sh && ./jarvis.sh
+```
+
+**Android (app Termux):** usa o binário Linux arm64, funciona normalmente:
+
+```bash
+pkg update && pkg install git curl unzip -y
+git clone --depth 1 https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode.git jarvis
+cd jarvis && chmod +x jarvis.sh && ./jarvis.sh
+```
+
+**iOS:** sem suporte nativo. O OpenCode não roda de verdade no terminal do iPhone/iPad. Caminho experimental: app **iSH** (emula Linux x86_64) com os comandos do Linux — instável e lento. Recomendado: a versão web (`opencode web`) em qualquer navegador.
+
+> No macOS/Linux/Android, o primeiro `jarvis.sh` baixa o binário certo do OpenCode para `bin/` automaticamente (uma vez só). No Windows, o `jarvis.bat` extrai o `bin\opencode-windows-x64.zip` embutido.
 
 OpenCode abre com o instalador já conversando com você. Tudo depois disso é conversa: ele pergunta o nome e a personalidade do seu agente (ou entrega o meu, Jarvis, pronto para usar), quais peças você quer e onde suas notas vivem. Ele mesmo faz o instalar, o configurar e o ligar isso tudo.
 
