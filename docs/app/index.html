@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jarvis — Assistente por Voz</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="brand">
+        <div class="logo">J</div>
+        <div>
+          <h1>JARVIS</h1>
+          <p class="tagline">Assistente pessoal por voz</p>
+        </div>
+      </div>
+
+      <button id="new-chat" class="btn full">
+        <span>+ Nova conversa</span>
+      </button>
+
+      <nav id="chats" class="chats"></nav>
+
+      <div class="sidebar-bottom">
+        <button id="open-settings" class="btn ghost full">Configurações</button>
+        <p class="status-line">
+          <span id="status-dot" class="dot"></span>
+          <span id="status-text">offline</span>
+        </p>
+      </div>
+    </aside>
+
+    <main id="chat">
+      <header id="chat-header">
+        <div class="header-info">
+          <span class="header-title">Jarvis Web</span>
+          <span class="header-model" id="header-model">modelo não configurado</span>
+        </div>
+        <div class="header-actions">
+          <button id="voice-toggle" class="btn icon" title="Ligar/desligar ler respostas em voz">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+          </button>
+          <button id="dark-toggle" class="btn icon" title="Alternar tema">
+            <svg id="icon-dark" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/></svg>
+            <svg id="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div id="messages" class="messages">
+        <div class="welcome">
+          <div class="welcome-logo">J</div>
+          <h2>Olá, sou o Jarvis.</h2>
+          <p>Pode me pedir por texto ou por voz: conversar, criar apps, programar — está tudo ligado.</p>
+          <div class="chips" id="chips">
+            <button class="chip" data-prompt="Crie um app de lista de tarefas">Criar app</button>
+            <button class="chip" data-prompt="Explique o que você faz em 3 linhas">Quem é você?</button>
+            <button class="chip" data-prompt="Me ajude a escrever um código em Python">Programar</button>
+          </div>
+        </div>
+      </div>
+
+      <footer id="composer">
+        <button id="mic-btn" class="btn mic" title="Falar (comando de voz)">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        </button>
+        <textarea id="input" rows="1" placeholder="Fale ou digite… (ex.: crie um app de calculadora)"></textarea>
+        <button id="send-btn" class="btn primary" title="Enviar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="2" y1="2" y2="22"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+        </button>
+      </footer>
+      <p class="hint">Microfone: clique e fale. Ao terminar com palavras como "envie" ou "crie", o Jarvis executa. Ler respostas em voz fica no alto.</p>
+    </main>
+  </div>
+
+  <dialog id="settings-modal">
+    <form method="dialog" class="modal-card" id="settings-form">
+      <h3>Configurações</h3>
+
+      <label>Provedor
+        <select id="provider">
+          <option value="openrouter">OpenRouter</option>
+          <option value="openai">OpenAI</option>
+          <option value="huggingface">HuggingFace</option>
+        </select>
+      </label>
+
+      <label>Modelo
+        <input id="model" type="text" placeholder="ex.: openai/gpt-4o-mini" />
+        <small id="model-help">Ajuste conforme o provedor escolhido.</small>
+      </label>
+
+      <label>Chave da API
+        <input id="api-key" type="password" placeholder="sk-…" />
+        <small>A chave fica salva só no seu navegador (localStorage).</small>
+      </label>
+
+      <label>Personalidade
+        <textarea id="persona" rows="4"></textarea>
+        <small>Descreva como o Jarvis deve se comportar.</small>
+      </label>
+
+      <div class="modal-actions">
+        <button value="cancel" class="btn ghost">Cancelar</button>
+        <button value="default" class="btn primary" id="save-settings">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
