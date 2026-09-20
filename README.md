@@ -21,7 +21,7 @@ Every piece is optional. The wizard asks which ones you want and explains each i
 
 ## Install
 
-**O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code, o OpenClaw, o Open-Lovable e o OpenJarvis. Nada se instala no seu PC além de descompactar esta pasta — o próprio Jarvis cuida do resto.
+**O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code, o OpenClaw, o Open-Lovable, o Freebuff e o OpenJarvis. Nada se instala no seu PC além de descompactar esta pasta — o próprio Jarvis cuida do resto.
 
 **Windows (PowerShell):** baixa o toolbox e abre o Jarvis. Ele descompacta o OpenCode da pasta `bin\` e inicia o assistente de setup:
 
@@ -157,6 +157,29 @@ npm run dev        # web UI (assistente de apps)
 ```
 
 Pergunte ao Jarvis (falando): "crie um app com a cópia do Lovable" — ele usa esta pasta para gerar a aplicação.
+
+## Freebuff
+
+Em `freebuff/` está o **[Freebuff](https://github.com/CodebuffAI/freebuff)** — o agente de codificação gratuito (Apache-2.0): **5 produtos de IA gratuitos** (CLI, Web, Cloud, Desktop e Chat) para codificar, construir e pesquisar — **sem assinatura, sem créditos e sem chave de API** (modelos incluídos, com anúncios em texto):
+
+```bash
+npm install -g freebuff
+freebuff           # CLI: descreva o que quer e ele edita, roda e revisa
+```
+
+O Freebuff roda **junto com o Open-Lovable**: enquanto o Open-Lovable gera o app a partir da conversa (web UI), o Freebuff codeja/melhora o projeto no terminal usando os modelos grátis inclusos. Veja `freebuff/JARVIS.md` para o fluxo conjunto.
+
+Integração no Jarvis:
+
+```bash
+cd freebuff && npm install -g .   # instala o CLI local
+freebuff                         # no diretório do app gerado pelo Open-Lovable
+```
+
+Modelos gratuitos inclusos: GLM 5.3 Flash, DeepSeek V4.1 Flash, GPT-5.6 Luna, MiMo 2.5, Solar Pro 4 e Muse Spark 1.2.
+
+Docs: https://freebuff.com
+Licença: Apache-2.0 (ver `freebuff/LICENSE`)
 
 ## Codex
 
