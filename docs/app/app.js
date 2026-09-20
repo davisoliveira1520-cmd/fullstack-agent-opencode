@@ -30,7 +30,7 @@ const GATEWAY_LOCAL = "http://localhost:18789";
 
 function localGatewayBase() {
   const h = location.hostname;
-  if (h === "localhost" || h === "127.0.0.1" || h === "[::1]") {
+  if (h === "localhost" || h === "127.0.0.1" || h === "[::1]" || location.protocol === "https:") {
     return location.origin;
   }
   return GATEWAY_LOCAL;

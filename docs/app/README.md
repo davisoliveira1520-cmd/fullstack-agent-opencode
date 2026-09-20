@@ -4,18 +4,18 @@ O **Jarvis Web** é o app web do Jarvis: um assistente pessoal que responde por 
 
 ## Como funciona (auto-suficiente)
 
-Por padrão o Jarvis Web usa o **OpenCode + OpenClaw da sua própria máquina** — nada de chave no site:
+Por padrão o Jarvis Web usa o **OpenCode + OpenClaw** — nada de chave no site:
 
-1. Rode o servidor local no seu PC:
-   - **Windows:** `jarvis-server.bat` (na raiz do Jarvis)
-   - **macOS/Linux:** `./jarvis-server.sh`
-2. Ele sobe o **OpenClaw Gateway** em `http://localhost:18789` **e o próprio app web** em `http://localhost:8080` — usando as chaves e agentes que você já tem (OpenCode / OpenClaw / Open-Lovable).
-3. Abra **http://localhost:8080** e fale. Ele conversa com o seu Jarvis — sem pedir chave nenhuma.
+**Opção A — Um único link (recomendado):** o Jarvis rodando numa máquina sempre ligada (ex.: ZimaBoard) com HTTPS serve o app **e** o cérebro juntos:
+1. Na ZimaBoard: `bash zima/deploy.sh` (instala OpenClaw, Caddy/HTTPS e copia o app).
+2. Pronto: um único link `https://jarvis.seudominio` funciona no PC, na internet e no celular — **sem instalar nada em nenhum aparelho**.
+
+**Opção B — Só na sua máquina:** rode `jarvis-server.bat` (Windows) / `./jarvis-server.sh` e abra `http://localhost:8080`.
 
 ## Como rodar
 
-- **Recomendado (modo local, sem chave):** rode `jarvis-server.bat`/`.sh` e abra `http://localhost:8080`. O app e o gateway são servidos localmente (sem bloqueios de CORS).
-- **Página publicada:** abra em `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/` — funciona com os provedores de nuvem (plano B). O modo local pela página publicada é **bloqueado pelo navegador (CORS)**, use o `localhost:8080` para isso.
+- **Um link, tudo dentro (Zima/nuvem):** `bash zima/deploy.sh` e abra o domínio HTTPS. O app e o gateway vivem no mesmo endereço (sem CORS).
+- **Página publicada:** `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/` — funciona com provedores de nuvem (plano B). O modo Jarvis local via página publicada é **bloqueado pelo navegador (CORS)**; para isso use a Opção A ou B.
 
 ## Configuração
 
@@ -53,6 +53,6 @@ O resultado vem em um bloco de código com o código html. No bloco, o botão **
 
 ## Limitações conhecidas
 
-- Para o modo local (sem chave), rode o `jarvis-server` e abra **http://localhost:8080** (o modo local não funciona pela página publicada por causa do CORS do navegador).
+- Para o modo Jarvis local (sem chave), use a **Opção A** (Zima/domínio HTTPS — recomendado) ou **Opção B** (`jarvis-server`, `http://localhost:8080`). A página publicada no GitHub Pages não acessa o gateway local por causa do CORS do navegador.
 - A voz é processada no próprio navegador (Web Speech API).
 - O Jarvis Web é uma interface web; os agentes de terminal (OpenCode, Claude Code, Codex, OpenClaw) continuam rodando pela CLI — veja o `README.md` na raiz deste repositório.
