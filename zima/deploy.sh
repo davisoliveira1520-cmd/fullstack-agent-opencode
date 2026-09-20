@@ -44,6 +44,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WEB_DIR="/var/www/jarvis"
 SERVICE_NAME="jarvis-gateway"
 
+# Usuario dono da config (~/.openclaw): se rodamos como root via sudo,
+# usa o usuario original (SUDO_USER); senao, o usuario corrente.
+SERVICE_USER="${SUDO_USER:-$USER}"
+echo "  Servico rodara como usuario: ${SERVICE_USER}"
+
 echo "  [1/6] Node.js"
 if command -v node >/dev/null 2>&1 && [ "$(node -v | sed 's/v//' | cut -d. -f1)" -ge 18 ]; then
   echo "        Node ja instalado: $(node -v)"
@@ -67,8 +72,30 @@ else
   $SUDO npm install -g openclaw@latest
 fi
 
+# Descobre o caminho REAL do binario (varia de distro pra distro:
+#  /usr/bin no Ubuntu, /usr/local/bin no macOS etc.)
+OPENCLAW_BIN="$(command -v openclaw 2>/dev/null || true)"
+if [ -z "${OPENCLAW_BIN}" ]; then
+  # tenta achar por cima do npm/global
+  for p in /usr/local/bin/openclaw /usr/bin/openclaw /opt/homebrew/bin/openclaw "${HOME}/.local/bin/openclaw" "${HOME}/bin/openclaw"; do
+    if [ -f "${p}" ]; then
+      OPENCLAW_BIN="${p}"
+      break
+    fi
+  done
+fi
+if [ -z "${OPENCLAW_BIN}" ]; then
+  echo "        [ERRO] nao consegui localizar o binario do openclaw apos a instalacao."
+  exit 1
+fi
+echo "        OpenClaw bin: ${OPENCLAW_BIN}"
+
 echo "  [3/6] Configuracao do gateway (~/.openclaw/openclaw.json)"
-OCONF="${HOME}/.openclaw"
+if [ "${SERVICE_USER}" = "root" ]; then
+  OCONF="/root/.openclaw"
+else
+  OCONF="$(eval echo "~${SERVICE_USER}")/.openclaw"
+fi
 OCONF_FILE="${OCONF}/openclaw.json"
 if [ ! -d "${OCONF}" ]; then
   mkdir -p "${OCONF}"
@@ -147,9 +174,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=${USER}
+User=${SERVICE_USER}
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
-ExecStart=/usr/local/bin/openclaw gateway run --port 18789 --allow-unconfigured
+ExecStart=${OPENCLAW_BIN} gateway run --port 18789 --allow-unconfigured
 Restart=always
 RestartSec=5
 
@@ -162,6 +189,34 @@ $SUDO systemctl enable ${SERVICE_NAME}
 $SUDO systemctl restart ${SERVICE_NAME}
 
 $SUDO systemctl reload caddy 2>/dev/null || $SUDO systemctl restart caddy
+
+echo ""
+echo "  ------------------------------------------------------------------"
+echo "  [Saude] Verificando servicos..."
+sleep 3
+if $SUDO systemctl is-active --quiet ${SERVICE_NAME}; then
+  echo "        OK: serviço ${SERVICE_NAME} ativo"
+else
+  echo "        [ERRO] serviço ${SERVICE_NAME} inativo. Veja os logs:"
+  echo "        sudo journalctl -u ${SERVICE_NAME} -f"
+fi
+if $SUDO systemctl is-active --quiet caddy; then
+  echo "        OK: Caddy ativo"
+else
+  echo "        [AVISO] Caddy inativo. Veja: sudo journalctl -u caddy -f"
+fi
+
+# testa o endpoint local do gateway (sem sair de casa)
+if command -v curl >/dev/null 2>&1; then
+  LOC_STATUS="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18789/v1/models 2>/dev/null || true)"
+  echo "        Gateway local /v1/models -> HTTP ${LOC_STATUS:-falhou}"
+  if [ "${LOC_STATUS}" != "200" ]; then
+    echo "        [DICA] Se nao for 200: confira que ~/.openclaw/openclaw.json tem"
+    echo '        gateway.http.endpoints.chatCompletions.enabled: true'
+  fi
+fi
+
+echo "  ------------------------------------------------------------------"
 
 echo ""
 echo "  ============================================================"
