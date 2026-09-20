@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
-import { spawn } from "node:child_process";
+import { spawn, exec } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -142,14 +142,26 @@ const server = createServer((req, res) => {
   }
 });
 
+function openBrowser(url) {
+  const p = process.platform;
+  let cmd;
+  if (p === "win32") cmd = `cmd /c start "" "${url}"`;
+  else if (p === "darwin") cmd = `open "${url}"`;
+  else cmd = `xdg-open "${url}" >/dev/null 2>&1`;
+  exec(cmd, (err) => {
+    if (err) log("Não consegui abrir o navegador automaticamente. Abra manualmente: " + url);
+  });
+}
+
 async function main() {
   startGateway();
-  await waitForGateway();
   server.listen(WEB_PORT, "127.0.0.1", () => {
-    log(`Jarvis Web rodando em http://localhost:${WEB_PORT}  (vá com o navegador!)`);
+    log(`Jarvis Web rodando em http://localhost:${WEB_PORT}`);
     log(`Gateway local (OpenClaw/OpenCode): ${GATEWAY_URL}`);
-    log(`Pressione Ctrl+C para encerrar tudo.`);
+    log(`Abrindo o navegador... (a janela desta etapa fica aberta; Ctrl+C encerra).`);
+    setTimeout(() => openBrowser(`http://localhost:${WEB_PORT}`), 1000);
   });
+  waitForGateway();
 }
 
 main();

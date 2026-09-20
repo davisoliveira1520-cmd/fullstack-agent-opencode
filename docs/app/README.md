@@ -10,7 +10,7 @@ O Jarvis Web usa o **OpenCode + OpenClaw** — **sem chave, sem conta, sem nuvem
 1. Na ZimaBoard: `bash zima/deploy.sh` (instala OpenClaw, Caddy/HTTPS e copia o app).
 2. Pronto: um único link `https://jarvis.seudominio` funciona no PC, na internet e no celular — **sem instalar nada em nenhum aparelho**.
 
-**Opção B — Só na sua máquina:** rode `jarvis-server.bat` (Windows) / `./jarvis-server.sh` e abra `http://localhost:8080`.
+**Opção B — Só na sua máquina:** duplo-clique em `jarvis.bat` (Windows) e pronto — ele instala Node/OpenClaw na primeira vez e **abre o Jarvis no navegador automaticamente**, sem digitar endereço. (Alternativa manual: `jarvis-server.bat` / `./jarvis-server.sh` e acessar `http://localhost:8080`.)
 
 ## Como rodar
 

@@ -1,27 +1,83 @@
 @echo off
-rem Jarvis launcher (Windows): everything lives inside this repo.
-rem OpenCode is bundled in bin\ and extracted on first run — nothing is
-rem installed on this machine. Close the window (or Ctrl-C) to stop.
-rem Copyright (C) 2026 Jared Rhodenizer
-rem SPDX-License-Identifier: AGPL-3.0-or-later
+setlocal enableextensions
+REM ============================================================
+REM  JARVIS (Windows) — abra e use. Nada de link extra.
+REM  Um duplo-clique: instala Node/OpenClaw se faltar (1a vez),
+REM  sobe o cerebro local e ABRE o Jarvis no navegador sozinho.
+REM  Feche a janela (ou Ctrl+C) para encerrar tudo.
+REM ============================================================
 
-setlocal
 cd /d "%~dp0"
 
-rem Extract the bundled OpenCode binary on first run.
-if not exist "bin\opencode.exe" (
-  echo   Jarvis: preparing OpenCode (one-time, inside this repo)...
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -Force -LiteralPath 'bin\opencode-windows-x64.zip' -DestinationPath 'bin'" >nul
+echo.
+echo  ============================================================
+echo    JARVIS  -  abrindo o seu assistente...
+echo  ============================================================
+echo.
+
+REM ---- 1) Node.js (usado pelo cerebro e pelo servidor web) ----
+where node >nul 2>nul
+if errorlevel 1 (
+  echo  Node.js nao encontrado. Vou instalar automaticamente (uma vez)...
+  where winget >nul 2>nul
   if errorlevel 1 (
-    echo   Could not unpack bin\opencode-windows-x64.zip. Is the file still there?
-    pause
-    exit /b 1
+    echo  [ERRO] Nao achei o winget para instalar o Node.js.
+    echo  Instale o Node.js em https://nodejs.org e rode o jarvis.bat de novo.
+    goto cli
+  )
+  winget install --id OpenJS.NodeJS.LTS -e --silent --accept-package-agreements --accept-source-agreements
+  if errorlevel 1 (
+    echo  [ERRO] Falha ao instalar o Node.js pelo winget.
+    echo  Instale o Node.js em https://nodejs.org e rode o jarvis.bat de novo.
+    goto cli
+  )
+  set "PATH=%PATH%;%ProgramFiles%\nodejs;%APPDATA%\npm"
+)
+
+where node >nul 2>nul
+if errorlevel 1 (
+  echo  [ERRO] Node.js instalado mas nao entrou no PATH.
+  echo  Feche e reabra o terminal e rode o jarvis.bat de novo.
+  goto cli
+)
+
+REM ---- 2) OpenClaw (cerebro local, gateway HTTP) ----
+where openclaw >nul 2>nul
+if errorlevel 1 (
+  if not exist "%APPDATA%\npm\openclaw.cmd" (
+    echo  OpenClaw nao encontrado. Instalando automaticamente (uma vez)...
+    call npm install -g openclaw@latest
+  )
+  set "PATH=%PATH%;%APPDATA%\npm"
+)
+where openclaw >nul 2>nul
+if errorlevel 1 (
+  if exist "%APPDATA%\npm\openclaw.cmd" (
+    set "OPENCLAW_PATH=%APPDATA%\npm\openclaw.cmd"
+  ) else (
+    echo  [ERRO] Nao consegui instalar o OpenClaw.
+    echo  Rode manualmente:  npm install -g openclaw@latest
+    goto cli
   )
 )
 
-rem Run the Jarvis wizard from this repo (reads AGENTS.md + fullstack-agent.md).
-echo   Jarvis: starting OpenCode...
-"bin\opencode.exe" "set me up"
+echo  Cerebro e servidor prontos. Abrindo o Jarvis no navegador...
+echo  (Mantenha esta janela aberta enquanto usar. Ctrl+C fecha tudo.)
+echo.
+node jarvis-web-server.mjs
 
+echo.
+echo  Jarvis encerrado.
+pause
+exit /b 0
+
+:cli
+echo.
+echo  Abrindo o Jarvis no terminal (modo CLI) ate instalar os requisitos...
+if exist "bin\opencode.exe" (
+  "bin\opencode.exe" "set me up"
+) else (
+  echo  bin\opencode.exe nao encontrado. Baixe o OpenCode do site oficial.
+)
 echo.
 pause

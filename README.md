@@ -23,13 +23,13 @@ Every piece is optional. The wizard asks which ones you want and explains each i
 
 **O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code, o OpenClaw, o Open-Lovable, o Freebuff e o OpenJarvis. Nada se instala no seu PC além de descompactar esta pasta — o próprio Jarvis cuida do resto.
 
-**Windows (PowerShell):** baixa o toolbox e abre o Jarvis. Ele descompacta o OpenCode da pasta `bin\` e inicia o assistente de setup:
+**Windows (PowerShell):** baixa o toolbox e abre o Jarvis no navegador. Na primeira execução, o `jarvis.bat` instala Node.js/OpenClaw automaticamente e sobe o assistente:
 
 ```
 $d="$env:USERPROFILE\.local\bin"; if (Test-Path "$d\opencode.exe") { $env:Path="$d;$env:Path" }; New-Item -ItemType Directory -Force -Path $HOME\jarvis | Out-Null; cd $HOME\jarvis; if (-not (Test-Path jarvis.bat)) { Invoke-WebRequest https://github.com/davisoliveira1520-cmd/fullstack-agent-opencode/archive/refs/heads/main.zip -OutFile jarvis.zip; Expand-Archive jarvis.zip . -Force; New-Item -ItemType Directory -Force -Path jarvis | Out-Null; Get-ChildItem fullstack-agent-opencode-main -Force | Copy-Item -Destination jarvis -Recurse -Force; Remove-Item fullstack-agent-opencode-main -Recurse -Force; Remove-Item jarvis.zip }; cd jarvis
 ```
 
-Depois do download, é só **duplo-clique em `jarvis.bat`** (Windows). Ele extrai o OpenCode para `bin\` e abre o Jarvis falando com você. No macOS/Linux: `chmod +x jarvis.sh && ./jarvis.sh`.
+Depois do download, é só **duplo-clique em `jarvis.bat`** (Windows). Na primeira vez ele instala Node.js e o OpenClaw sozinho e **abre o Jarvis no navegador automaticamente** — fale e use. Prefere terminal? `jarvis-cli.bat`. No macOS/Linux: `chmod +x jarvis.sh && ./jarvis.sh`.
 
 **Instalação oficial:**
 
