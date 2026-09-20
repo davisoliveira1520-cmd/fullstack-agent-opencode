@@ -38,6 +38,11 @@ Provedores de nuvem suportados (plano B): **OpenRouter**, **OpenAI**, **HuggingF
 Comandos especiais por voz:
 - "limpe a conversa" → zera a conversa atual.
 - "configurações" → abre o painel de configurações.
+- "nova conversa" → começa uma conversa do zero.
+- "pare de falar" / "silêncio" → corta a leitura em voz na hora.
+- "repita" → lê de novo a última resposta.
+
+Enquanto o Jarvis fala, aparece uma barra "Lendo resposta em voz…"; enquanto ouve, um aviso "Ouvindo… fale seu comando".
 
 Funciona em navegadores com suporte a Web Speech API (**Chrome/Edge** recomendados).
 
@@ -49,7 +54,11 @@ Qualquer pedido com "crie/faz/gera" + algo de app faz o Jarvis **gerar um app HT
 > "faz um site de previsão do tempo"
 > "criar um app de calculadora"
 
-O resultado vem em um bloco de código com o código html. No bloco, o botão **⬇ Baixar app** salva o arquivo `.html` — abra e use.
+O resultado vem em um bloco de código com o código html. No bloco:
+- **▶ Abrir app** — roda o app na própria página (tela cheia) e dá **🔗 Copiar link**.
+- **🔗 Link p/ celular** — copia um link que abre o app sozinho em qualquer aparelho, sem instalar nada (o próprio app do Jarvis vira o "servidor").
+- **⬇ Baixar** — salva o arquivo `.html` para usar à vontade.
+- **Copiar código** — pega só o HTML.
 
 ## Limitações conhecidas
 

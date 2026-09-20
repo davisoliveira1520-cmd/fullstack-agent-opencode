@@ -117,6 +117,8 @@ const settingsForm = $("#settings-form");
 
 /* ---------------- Inicialização ---------------- */
 function init() {
+  bindEvents();
+  if (bootFromAppLink()) return;
   applySettingsToUI();
   applyTheme();
   voiceToggle.classList.toggle("active", state.speechOn);
@@ -126,7 +128,6 @@ function init() {
   } else {
     setActiveChat(state.chats[0].id);
   }
-  bindEvents();
   updateStatus("on", state.busy ? "processando" : "online");
   checkLocalGateway();
 }
@@ -157,6 +158,8 @@ function bindEvents() {
     state.speechOn = !state.speechOn;
     voiceToggle.classList.toggle("active", state.speechOn);
     if (!state.speechOn && window.speechSynthesis) speechSynthesis.cancel();
+    if (!state.speechOn) hideIndicators();
+    if (state.speechOn) toast("Voz de respostas ligada 🔊");
   });
   darkToggle.addEventListener("click", toggleTheme);
   $("#new-chat").addEventListener("click", () => newChat());
@@ -166,6 +169,19 @@ function bindEvents() {
     if (copyBtn) copyCode(copyBtn.dataset.copy);
     const dl = e.target.closest("[data-download-app]");
     if (dl) downloadApp(dl.dataset.downloadApp);
+    const pv = e.target.closest("[data-preview-app]");
+    if (pv) openApp(pv.dataset.previewApp);
+    const ln = e.target.closest("[data-link-app]");
+    if (ln) copyAppLink(ln.dataset.linkApp);
+  });
+  const avBack = $("#av-back");
+  if (avBack) avBack.addEventListener("click", exitAppViewer);
+  const avCopy = $("#av-copy-link");
+  if (avCopy) avCopy.addEventListener("click", () => {
+    const link = viewerAppSource
+      ? `${location.origin}${location.pathname}?app=${b64encode(viewerAppSource)}`
+      : location.href;
+    copyText(link, "Link copiado!");
   });
   $("#chips").addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
@@ -334,12 +350,12 @@ function showWelcome() {
       <div class="bubble">
         <div class="typearea">
           <p>Olá, sou o <strong>Jarvis</strong>. Posso conversar, programar e <strong>criar apps</strong> por texto ou por voz.</p>
-          <p>Experimente: <em>"crie um app de lista de tarefas"</em> — eu gero um app HTML pronto para baixar.</p>
+          <p>Experimente: <em>"crie um app de lista de tarefas"</em> — eu gero um app que você pode <strong>abrir aqui</strong>, mandar <strong>link para o celular</strong> ou baixar.</p>
         </div>
       </div>
     </div>`;
   const ta = messagesEl.querySelector(".typearea");
-  typeWriter(ta, "Olá, sou o Jarvis. Posso conversar, programar e criar apps por texto ou por voz. Pode me pedir por voz: 'crie um app de lista de tarefas' — eu gero um app pronto.");
+  typeWriter(ta, "Olá, sou o Jarvis. Posso conversar, programar e criar apps por texto ou por voz. Pode me pedir: 'crie um app de lista de tarefas' — eu gero e te dou link para abrir no celular.");
 }
 
 /* ---------------- Mensagens ---------------- */
@@ -416,10 +432,12 @@ function renderContent(content) {
     const appCard = isApp ? `
       <div class="app-card">
         <span class="app-title">App gerado pelo Jarvis</span>
-        <span class="app-desc">HTML único, pronto para usar</span>
+        <span class="app-desc">HTML único, pronto para abrir ou usar em qualquer aparelho</span>
         <span class="app-actions">
-          <button class="btn primary" data-download-app="${i}">⬇ Baixar app</button>
-          <button class="btn" data-copy="${i}">Copiar código</button>
+          <button class="btn primary" data-preview-app="${i}">▶ Abrir app</button>
+          <button class="btn" data-link-app="${i}">🔗 Link p/ celular</button>
+          <button class="btn" data-download-app="${i}">⬇ Baixar</button>
+          <button class="btn ghost" data-copy="${i}">Copiar código</button>
         </span>
       </div>` : "";
 
@@ -433,7 +451,7 @@ function copyCode(i) {
   const chat = getActiveChat();
   const block = extractBlock(chat.messages, i);
   if (!block) return;
-  navigator.clipboard.writeText(block).then(() => toast("Código copiado!"));
+  copyText(block, "Código copiado!");
 }
 
 function downloadApp(i) {
@@ -459,6 +477,115 @@ function extractBlock(messages, i) {
     while ((x = re.exec(m.content))) blocks.push(x[1].trim());
   }
   return blocks[i] || null;
+}
+
+/* App: abrir na tela ou gerar link para outros aparelhos */
+let viewerAppSource = null;
+
+function b64encode(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  bytes.forEach((b) => (bin += String.fromCharCode(b)));
+  return btoa(bin);
+}
+
+function b64decode(str) {
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+function getAppBlock(i) {
+  const chat = getActiveChat();
+  if (!chat) return null;
+  return extractBlock(chat.messages, i);
+}
+
+function getAppLink(i) {
+  const block = getAppBlock(i);
+  if (!block) return null;
+  return `${location.origin}${location.pathname}?app=${b64encode(block)}`;
+}
+
+function openApp(i) {
+  const block = getAppBlock(i);
+  if (!block) return;
+  showAppViewer(block);
+}
+
+function copyAppLink(i) {
+  const link = getAppLink(i);
+  if (!link) return;
+  copyText(link, "Link copiado! Abra no celular e o app roda sozinho 📱");
+}
+
+function copyText(text, okMsg) {
+  const done = () => toast(okMsg || "Copiado!");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => legacyCopy(text, done));
+  } else {
+    legacyCopy(text, done);
+  }
+}
+
+function legacyCopy(text, done) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand("copy");
+    done();
+  } catch {}
+  document.body.removeChild(ta);
+}
+
+function showAppViewer(html) {
+  const frame = document.querySelector("#app-viewer iframe");
+  const app = $("#app");
+  const viewer = $("#app-viewer");
+  if (!frame || !viewer) return;
+  viewerAppSource = html;
+  frame.srcdoc = html;
+  app.hidden = true;
+  viewer.hidden = false;
+  stopListening(true);
+  hideIndicators();
+  if (window.speechSynthesis) speechSynthesis.cancel();
+}
+
+function exitAppViewer() {
+  const app = $("#app");
+  const viewer = $("#app-viewer");
+  if (viewer) viewer.hidden = true;
+  if (app) app.hidden = false;
+  if (history.replaceState) {
+    history.replaceState(null, "", location.pathname);
+  }
+}
+
+function bootFromAppLink() {
+  const param = new URLSearchParams(location.search).get("app");
+  if (!param) return false;
+  let html;
+  try {
+    html = b64decode(param);
+  } catch {
+    return false;
+  }
+  const frame = document.querySelector("#app-viewer iframe");
+  const app = $("#app");
+  const viewer = $("#app-viewer");
+  if (!frame || !viewer || !app) return false;
+  viewerAppSource = html;
+  frame.srcdoc = html;
+  app.hidden = true;
+  viewer.hidden = false;
+  document.title = "App do Jarvis";
+  return true;
 }
 
 /* ---------------- Envio ---------------- */
@@ -659,6 +786,8 @@ function startListening() {
   inputEl.value = "";
   recognitionRunning = true;
   micBtn.classList.add("active");
+  const pill = $("#listening-pill");
+  if (pill) pill.hidden = false;
   toast("🎙 Ouvindo… fale ou digite o comando");
   updateStatus("busy", "ouvindo…");
   try {
@@ -669,6 +798,7 @@ function startListening() {
 function stopListening(reset) {
   recognitionRunning = false;
   micBtn.classList.remove("active");
+  hideIndicators();
   if (recognition) {
     try { recognition.stop(); } catch {}
   }
@@ -677,6 +807,14 @@ function stopListening(reset) {
     sendMessage(finalTranscript.trim());
   }
   finalTranscript = "";
+}
+
+function hideIndicators() {
+  const pill = $("#listening-pill");
+  if (pill) pill.hidden = true;
+  const bar = $("#speaking-bar");
+  if (bar) bar.hidden = true;
+  micBtn.classList.remove("speaking");
 }
 
 /* Comandos de voz especiais */
@@ -691,11 +829,39 @@ function listenForCommand(text) {
     messagesEl.innerHTML = "";
     showWelcome();
     toast("Conversa limpa");
+    return;
   }
   // "configurações" → abre menu
   if (/\bconfigura[cç][õo]es\b/.test(t)) {
     stopListening();
     openSettings();
+    return;
+  }
+  // "nova conversa" → começa do zero
+  if (/\b(nova|noutra|outra)\s+conversa\b|\b(zera|zerar)\b/.test(t)) {
+    stopListening();
+    newChat();
+    toast("Nova conversa iniciada");
+    return;
+  }
+  // "pare de falar / silêncio" → corta a leitura em voz
+  if (/\b(par[ae] de falar|sil[eê]ncio|cale a boca|quieto)\b/.test(t)) {
+    stopListening();
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    hideIndicators();
+    toast("🔇 Voz pausada");
+    return;
+  }
+  // "repita" → repete a última resposta
+  if (/\b(repita|repete a|diga de novo|fale de novo)\b/.test(t)) {
+    stopListening();
+    const chat = getActiveChat();
+    const last = chat && [...chat.messages].reverse().find((m) => m.role === "assistant");
+    if (last) {
+      speak(last.content);
+      toast("🔁 Repetindo última resposta");
+    }
+    return;
   }
 }
 
@@ -711,11 +877,28 @@ function speak(text) {
     .slice(0, 2200);
   const u = new SpeechSynthesisUtterance(clean);
   u.lang = "pt-BR";
-  u.rate = 1.02;
-  u.pitch = 0.95;
+  u.rate = 1.0;
+  u.pitch = 0.98;
   const voices = speechSynthesis.getVoices();
-  const br = voices.find((v) => v.lang === "pt-BR");
+  const br = voices
+    .find((v) => /pt[-_]?BR/i.test(v.lang) && /(google|natural|neural|microso?ft)/i.test(v.name))
+    || voices.find((v) => /pt[-_]?BR/i.test(v.lang))
+    || voices.find((v) => /^pt/i.test(v.lang))
+    || voices.find((v) => /^en/i.test(v.lang));
   if (br) u.voice = br;
+  const bar = $("#speaking-bar");
+  u.onstart = () => {
+    micBtn.classList.add("speaking");
+    if (bar) bar.hidden = false;
+  };
+  u.onend = () => {
+    micBtn.classList.remove("speaking");
+    if (bar) bar.hidden = true;
+  };
+  u.onerror = () => {
+    micBtn.classList.remove("speaking");
+    if (bar) bar.hidden = true;
+  };
   speechSynthesis.speak(u);
 }
 

@@ -12,7 +12,7 @@
   <div id="app">
     <aside id="sidebar">
       <div class="brand">
-        <div class="logo">J</div>
+        <div class="logo arc">J</div>
         <div>
           <h1>JARVIS</h1>
           <p class="tagline">Assistente pessoal por voz</p>
@@ -51,9 +51,20 @@
         </div>
       </header>
 
+      <div id="voice-indicators">
+        <div id="speaking-bar" class="vind" hidden>
+          <span class="wave"><i></i><i></i><i></i><i></i></span>
+          Lendo resposta em voz…
+        </div>
+        <div id="listening-pill" class="vind listening" hidden>
+          <span class="pulse"></span>
+          Ouvindo… fale seu comando
+        </div>
+      </div>
+
       <div id="messages" class="messages">
         <div class="welcome">
-          <div class="welcome-logo">J</div>
+          <div class="welcome-logo arc">J</div>
           <h2>Olá, sou o Jarvis.</h2>
           <p>Pode me pedir por texto ou por voz: conversar, criar apps, programar — está tudo ligado.</p>
           <div class="chips" id="chips">
@@ -73,8 +84,19 @@
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="2" y1="2" y2="22"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
         </button>
       </footer>
-      <p class="hint">Microfone: clique e fale. Ao terminar com palavras como "envie" ou "crie", o Jarvis executa. Ler respostas em voz fica no alto.</p>
+      <p class="hint">Microfone: clique e fale. Ao terminar com palavras como "envie" ou "crie", o Jarvis executa. Peça apps: depois clique em <strong>Abrir</strong> ou <strong>Link p/ celular</strong> para rodar em qualquer aparelho. Ler respostas em voz fica no alto.</p>
     </main>
+  </div>
+
+  <div id="app-viewer" hidden>
+    <div class="av-header">
+      <button id="av-back" class="btn ghost">← Voltar ao chat</button>
+      <span>App criado pelo Jarvis — rodando nesta página</span>
+      <button id="av-copy-link" class="btn">🔗 Copiar link</button>
+    </div>
+    <div class="av-frame">
+      <iframe sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-popups"></iframe>
+    </div>
   </div>
 
   <dialog id="settings-modal">
