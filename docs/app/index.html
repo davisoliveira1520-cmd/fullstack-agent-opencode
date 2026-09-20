@@ -83,18 +83,21 @@
 
       <label>Provedor
         <select id="provider">
+          <option value="local">Jarvis local (OpenCode/OpenClaw) — sem chave</option>
           <option value="openrouter">OpenRouter</option>
           <option value="openai">OpenAI</option>
           <option value="huggingface">HuggingFace</option>
         </select>
       </label>
 
+      <p id="local-status" class="hint" style="margin:0">Verificando o servidor local…</p>
+
       <label>Modelo
         <input id="model" type="text" placeholder="ex.: openai/gpt-4o-mini" />
         <small id="model-help">Ajuste conforme o provedor escolhido.</small>
       </label>
 
-      <label>Chave da API
+      <label id="api-key-label">Chave da API
         <input id="api-key" type="password" placeholder="sk-…" />
         <small>A chave fica salva só no seu navegador (localStorage).</small>
       </label>

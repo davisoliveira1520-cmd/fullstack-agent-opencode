@@ -9,9 +9,10 @@
    ============================================================ */
 
 const DEFAULTS = {
-  provider: "openrouter",
-  model: "openai/gpt-4o-mini",
+  provider: "local",
+  model: "openclaw",
   modelHelp: {
+    local: "modo local: usa o OpenClaw/OpenCode da sua máquina (sem chave)",
     openrouter: "ex.: openai/gpt-4o-mini, anthropic/claude-3.5-sonnet, deepseek/deepseek-chat",
     openai: "ex.: gpt-4o-mini",
     huggingface: "ex.: Qwen/Qwen3-Coder-30B-A3B-Instruct (ou use OpenRouter)",
@@ -25,19 +26,30 @@ const DEFAULTS = {
     "Embrulhe o código HTML em um bloco ```html ... ``` para que o usuário possa baixá-lo.",
 };
 
+const GATEWAY_LOCAL = "http://localhost:18789";
+
 const PROVIDERS = {
+  local: {
+    url: `${GATEWAY_LOCAL}/v1/chat/completions`,
+    requiresKey: false,
+    headers: () => ({ "Content-Type": "application/json" }),
+    body: (model, messages) => ({ model, messages }),
+  },
   openrouter: {
     url: "https://openrouter.ai/api/v1/chat/completions",
+    requiresKey: true,
     headers: (key) => ({ Authorization: `Bearer ${key}`, "Content-Type": "application/json" }),
     body: (model, messages) => ({ model, messages }),
   },
   openai: {
     url: "https://api.openai.com/v1/chat/completions",
+    requiresKey: true,
     headers: (key) => ({ Authorization: `Bearer ${key}`, "Content-Type": "application/json" }),
     body: (model, messages) => ({ model, messages }),
   },
   huggingface: {
     url: "https://router.huggingface.co/v1/chat/completions",
+    requiresKey: true,
     headers: (key) => ({ Authorization: `Bearer ${key}`, "Content-Type": "application/json" }),
     body: (model, messages) => ({ model, messages }),
   },
@@ -108,6 +120,20 @@ function init() {
   }
   bindEvents();
   updateStatus("on", state.busy ? "processando" : "online");
+  checkLocalGateway();
+}
+
+async function checkLocalGateway() {
+  if ((state.settings.provider || "local") !== "local") return;
+  const ok = await reachableLocalGateway();
+  if (ok) {
+    statusDot.className = "dot on";
+    statusText.textContent = "Jarvis local conectado";
+    headerModel.textContent = "◉ OpenCode/OpenClaw local conectado";
+  } else {
+    statusDot.className = "dot";
+    statusText.textContent = "jarvis-server não está rodando";
+  }
 }
 
 function bindEvents() {
@@ -143,10 +169,36 @@ function bindEvents() {
   $("#provider").addEventListener("change", (e) => {
     const p = e.target.value;
     $("#model-help").textContent = DEFAULTS.modelHelp[p] || "";
-    if (state.settings.model || true) {
-      $("#model").placeholder = DEFAULTS.modelHelp[p] || "";
-    }
+    $("#model").placeholder = DEFAULTS.modelHelp[p] || "";
+    toggleApiKeyField(p);
+    updateLocalStatus(p);
   });
+}
+
+function toggleApiKeyField(provider) {
+  const keyLabel = $("#api-key-label");
+  if (!keyLabel) return;
+  keyLabel.classList.toggle("hidden", provider === "local");
+}
+
+async function updateLocalStatus(provider) {
+  const el = $("#local-status");
+  if (!el) return;
+  if (provider !== "local") {
+    el.style.display = "none";
+    return;
+  }
+  el.style.display = "block";
+  el.className = "hint";
+  el.textContent = "Verificando o servidor local…";
+  const ok = await reachableLocalGateway();
+  if (ok) {
+    el.className = "hint ok";
+    el.textContent = "✓ Jarvis local (OpenCode/OpenClaw) conectado em " + GATEWAY_LOCAL;
+  } else {
+    el.className = "hint off";
+    el.textContent = "✗ Servidor local não está rodando. No seu PC rode jarvis-server.bat (Windows) ou ./jarvis-server.sh (macOS/Linux), ou use um provedor de nuvem abaixo.";
+  }
 }
 
 /* ---------------- Tema ---------------- */
@@ -171,6 +223,8 @@ function openSettings() {
   $("#persona").value = s.persona || DEFAULTS.persona;
   $("#model-help").textContent = DEFAULTS.modelHelp[$("#provider").value] || "";
   $("#model").placeholder = DEFAULTS.modelHelp[$("#provider").value] || "";
+  toggleApiKeyField($("#provider").value);
+  updateLocalStatus($("#provider").value);
   settingsModal.showModal();
 }
 
@@ -183,12 +237,17 @@ settingsForm.addEventListener("close", () => {
     saveSettings();
     applySettingsToUI();
     toast("Configurações salvas");
+    checkLocalGateway();
   }
 });
 
 function applySettingsToUI() {
-  if (state.settings.model && state.settings.provider) {
-    headerModel.textContent = `${state.settings.provider} · ${state.settings.model}`;
+  const p = state.settings.provider || "local";
+  const m = state.settings.model;
+  if (p === "local") {
+    headerModel.textContent = "◉ OpenCode/OpenClaw local";
+  } else if (m && p) {
+    headerModel.textContent = `${p} · ${m}`;
   } else {
     headerModel.textContent = "modelo não configurado";
   }
@@ -448,28 +507,59 @@ function showTyping() {
 /* ---------------- IA ---------------- */
 async function callAI(messages) {
   const s = state.settings;
-  const provider = PROVIDERS[s.provider] || PROVIDERS.openrouter;
-  if (!s.apiKey) {
-    throw new Error("Configure a chave da API nas Configurações.");
-  }
+  let provider = PROVIDERS[s.provider] || PROVIDERS.local;
   const model = s.model || DEFAULTS.model;
   const sys = s.persona || DEFAULTS.persona;
 
+  // Habilita "criar app": o Jarvis responde com HTML puro quando o pedido é um app
+  const lastUser = [...messages].reverse().find((m) => m.role === "user");
+  const systemText = sys + (lastUser && /(cri(ar|e|ei)|faz|faça|ger(ar|a|e)) .*(app|site|calculadora|lista)/i.test(lastUser.content)
+    ? " Se o pedido for criar um app, responda APENAS com um bloco ```html contendo o app completo (CSS e JS embutidos), sem texto fora do bloco."
+    : "");
+
   const payload = {
-    messages: [{ role: "system", content: sys }, ...messages.map((m) => ({ role: m.role, content: m.content }))],
+    messages: [{ role: "system", content: systemText }, ...messages.map((m) => ({ role: m.role, content: m.content }))],
     max_tokens: 4000,
+    stream: false,
   };
 
-  // adiciona hint de "criar app" quando o usuário pede app
-  const lastUser = [...messages].reverse().find((m) => m.role === "user");
-  if (lastUser && /(cri(ar|e|ei)|faz|faça|ger(ar|a|e)) .*(app|site|calculadora|lista)/i.test(lastUser.content)) {
-    payload.messages[0].content +=
-      " Se o pedido for criar um app, responda APENAS com um bloco ```html contendo o app completo (CSS e JS embutidos), sem texto fora do bloco.";
+  // Passo 1: tenta o gateway local (OpenClaw/OpenCode) — sem chave
+  if (provider.requiresKey === false || !s.apiKey || !PROVIDERS[s.provider]) {
+    try {
+      return await chatCompletions(PROVIDERS.local, "local", model, payload);
+    } catch (err) {
+      // gateway local fora do ar
+    }
+    // Passo 2 (fallback): nuvem, se o usuário tiver chave configurada
+    if (s.apiKey && PROVIDERS[s.provider] && PROVIDERS[s.provider].requiresKey) {
+      provider = PROVIDERS[s.provider];
+      try {
+        return await chatCompletions(provider, s.provider, model, payload);
+      } catch (err) {
+        throw err;
+      }
+    }
+    throw new Error(
+      "O Jarvis local (OpenCode/OpenClaw) não está rodando aqui.\n" +
+      "No seu PC, abra jarvis-server.bat (Windows) ou ./jarvis-server.sh e tente de novo.\n" +
+      "Dica: para usar sem precisar do servidor, escolha um provedor (ex.: OpenRouter) nas Configurações e cole a chave."
+    );
   }
 
+  // provedor de nuvem escolhido com chave
+  if (!s.apiKey) {
+    throw new Error("Configure a chave da API nas Configurações.");
+  }
+  return await chatCompletions(provider, s.provider, model, payload);
+}
+
+async function chatCompletions(provider, name, model, payload) {
+  if (name === "local" && !(await reachableLocalGateway())) {
+    throw new Error("jarvis-server não está rodando em " + GATEWAY_LOCAL);
+  }
   const res = await fetch(provider.url, {
     method: "POST",
-    headers: provider.headers(s.apiKey),
+    headers: provider.headers(name === "local" ? "" : state.settings.apiKey),
     body: JSON.stringify(provider.body(model, payload.messages)),
   });
 
@@ -477,7 +567,7 @@ async function callAI(messages) {
     let msg = `HTTP ${res.status}`;
     try {
       const j = await res.json();
-      msg = (j.error && j.error.message) || j.message || msg;
+      msg = (j.error && (j.error.message || j.error)) || j.message || msg;
     } catch {}
     throw new Error(`Erro da API (${res.status}): ${msg}`);
   }
@@ -485,6 +575,18 @@ async function callAI(messages) {
   const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
   if (!content) throw new Error("Resposta vazia da API.");
   return content;
+}
+
+async function reachableLocalGateway() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 1500);
+    const r = await fetch(`${GATEWAY_LOCAL}/v1/models`, { signal: ctrl.signal });
+    clearTimeout(t);
+    return r.ok;
+  } catch {
+    return false;
+  }
 }
 
 /* ---------------- Voz ---------------- */

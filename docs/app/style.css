@@ -305,6 +305,10 @@ body {
 }
 .modal-card input:focus, .modal-card select:focus, .modal-card textarea:focus { border-color: var(--accent); }
 .modal-card small { color: var(--text-dim); font-size: 11.5px; line-height: 1.45; }
+#api-key-label.hidden { display: none; }
+#local-status { text-align: left; font-size: 12px; }
+#local-status.ok { color: var(--ok); }
+#local-status.off { color: var(--danger); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
 
 /* ---------- Toast ---------- */

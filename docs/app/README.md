@@ -1,32 +1,34 @@
-# Jarvis Web — Assistente por voz
+# Jarvis Web — Assistente por voz (modo local)
 
 O **Jarvis Web** é o app web do Jarvis: um assistente pessoal que responde por texto **e por voz**, e que **cria aplicativos** quando você pede (ex.: "crie um app de lista de tarefas") — gerando um arquivo HTML pronto para baixar e usar.
 
+## Como funciona (auto-suficiente)
+
+Por padrão o Jarvis Web usa o **OpenCode + OpenClaw da sua própria máquina** — nada de chave no site:
+
+1. Rode o servidor local no seu PC:
+   - **Windows:** `jarvis-server.bat` (na raiz do Jarvis)
+   - **macOS/Linux:** `./jarvis-server.sh`
+2. Ele sobe o **OpenClaw Gateway** em `http://localhost:18789`, usando as chaves e agentes que você já tem (OpenCode / OpenClaw / Open-Lovable).
+3. Abra o Jarvis Web e fale. Ele detecta o gateway local automaticamente e conversa com o seu Jarvis — sem pedir chave nenhuma.
+
 ## Como rodar
 
-Não precisa de build nem de instalar nada. Duas opções:
-
-1. **Direto no navegador**: abra o arquivo `index.html` (clique duas vezes). Tudo roda no browser.
-2. **Servidor local** (opcional):
-   ```bash
-   npx serve .
-   ```
-   e abra `http://localhost:3000`.
+- **Página publicada:** abra em `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/`
+- **Local:** abra `index.html` direto no navegador.
 
 ## Configuração
 
-Clique em **Configurações** e preencha:
+Abra **Configurações**:
 
 | Campo | O que é | Exemplo |
 |---|---|---|
-| Provedor | Quem responde as mensagens | OpenRouter (recomendado) |
-| Modelo | O modelo de IA | `openai/gpt-4o-mini` |
-| Chave da API | Sua chave (fica só no seu navegador) | `sk-or-…` |
-| Personalidade | Como o Jarvis se comporta | (pré-preenchido) |
+| Provedor | `Jarvis local (OpenCode/OpenClaw)` é o padrão — sem chave | local |
+| Provedor de nuvem (opcional) | Para conversar sem ter o servidor local rodando | OpenRouter |
 
-> A chave fica armazenada apenas no `localStorage` do seu navegador — não sai da sua máquina.
+> **Sem servidor local?** O Jarvis Web tenta primeiro o gateway local. Se não estiver rodando, usa o provedor de nuvem configurado (ex.: OpenRouter) — ou avisa para você ligar o `jarvis-server`.
 
-Provedores suportados: **OpenRouter**, **OpenAI**, **HuggingFace** (rota compatível `router.huggingface.co`).
+Provedores de nuvem suportados (plano B): **OpenRouter**, **OpenAI**, **HuggingFace** (rota compatível `router.huggingface.co`). A chave fica só no `localStorage` do seu navegador.
 
 ## Comando de voz
 
@@ -51,6 +53,6 @@ O resultado vem em um bloco de código com o código html. No bloco, o botão **
 
 ## Limitações conhecidas
 
-- Precisa de internet e de uma chave de API configurada.
+- Para o modo local (sem chave), o `jarvis-server` precisa estar rodando na mesma máquina/porta 18789.
 - A voz é processada no próprio navegador (Web Speech API).
 - O Jarvis Web é uma interface web; os agentes de terminal (OpenCode, Claude Code, Codex, OpenClaw) continuam rodando pela CLI — veja o `README.md` na raiz deste repositório.
