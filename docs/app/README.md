@@ -9,13 +9,13 @@ Por padrão o Jarvis Web usa o **OpenCode + OpenClaw da sua própria máquina** 
 1. Rode o servidor local no seu PC:
    - **Windows:** `jarvis-server.bat` (na raiz do Jarvis)
    - **macOS/Linux:** `./jarvis-server.sh`
-2. Ele sobe o **OpenClaw Gateway** em `http://localhost:18789`, usando as chaves e agentes que você já tem (OpenCode / OpenClaw / Open-Lovable).
-3. Abra o Jarvis Web e fale. Ele detecta o gateway local automaticamente e conversa com o seu Jarvis — sem pedir chave nenhuma.
+2. Ele sobe o **OpenClaw Gateway** em `http://localhost:18789` **e o próprio app web** em `http://localhost:8080` — usando as chaves e agentes que você já tem (OpenCode / OpenClaw / Open-Lovable).
+3. Abra **http://localhost:8080** e fale. Ele conversa com o seu Jarvis — sem pedir chave nenhuma.
 
 ## Como rodar
 
-- **Página publicada:** abra em `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/`
-- **Local:** abra `index.html` direto no navegador.
+- **Recomendado (modo local, sem chave):** rode `jarvis-server.bat`/`.sh` e abra `http://localhost:8080`. O app e o gateway são servidos localmente (sem bloqueios de CORS).
+- **Página publicada:** abra em `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/` — funciona com os provedores de nuvem (plano B). O modo local pela página publicada é **bloqueado pelo navegador (CORS)**, use o `localhost:8080` para isso.
 
 ## Configuração
 
@@ -53,6 +53,6 @@ O resultado vem em um bloco de código com o código html. No bloco, o botão **
 
 ## Limitações conhecidas
 
-- Para o modo local (sem chave), o `jarvis-server` precisa estar rodando na mesma máquina/porta 18789.
+- Para o modo local (sem chave), rode o `jarvis-server` e abra **http://localhost:8080** (o modo local não funciona pela página publicada por causa do CORS do navegador).
 - A voz é processada no próprio navegador (Web Speech API).
 - O Jarvis Web é uma interface web; os agentes de terminal (OpenCode, Claude Code, Codex, OpenClaw) continuam rodando pela CLI — veja o `README.md` na raiz deste repositório.

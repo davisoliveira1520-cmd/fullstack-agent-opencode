@@ -28,6 +28,14 @@ const DEFAULTS = {
 
 const GATEWAY_LOCAL = "http://localhost:18789";
 
+function localGatewayBase() {
+  const h = location.hostname;
+  if (h === "localhost" || h === "127.0.0.1" || h === "[::1]") {
+    return location.origin;
+  }
+  return GATEWAY_LOCAL;
+}
+
 const PROVIDERS = {
   local: {
     url: `${GATEWAY_LOCAL}/v1/chat/completions`,
@@ -194,10 +202,10 @@ async function updateLocalStatus(provider) {
   const ok = await reachableLocalGateway();
   if (ok) {
     el.className = "hint ok";
-    el.textContent = "✓ Jarvis local (OpenCode/OpenClaw) conectado em " + GATEWAY_LOCAL;
+    el.textContent = "✓ Jarvis local (OpenCode/OpenClaw) conectado em " + localGatewayBase();
   } else {
     el.className = "hint off";
-    el.textContent = "✗ Servidor local não está rodando. No seu PC rode jarvis-server.bat (Windows) ou ./jarvis-server.sh (macOS/Linux), ou use um provedor de nuvem abaixo.";
+    el.textContent = "✗ Servidor local não está rodando aqui. No seu PC, rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra http://localhost:8080. Ou use um provedor de nuvem abaixo.";
   }
 }
 
@@ -541,7 +549,7 @@ async function callAI(messages) {
     }
     throw new Error(
       "O Jarvis local (OpenCode/OpenClaw) não está rodando aqui.\n" +
-      "No seu PC, abra jarvis-server.bat (Windows) ou ./jarvis-server.sh e tente de novo.\n" +
+      "No seu PC, rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra http://localhost:8080.\n" +
       "Dica: para usar sem precisar do servidor, escolha um provedor (ex.: OpenRouter) nas Configurações e cole a chave."
     );
   }
@@ -555,9 +563,10 @@ async function callAI(messages) {
 
 async function chatCompletions(provider, name, model, payload) {
   if (name === "local" && !(await reachableLocalGateway())) {
-    throw new Error("jarvis-server não está rodando em " + GATEWAY_LOCAL);
+    throw new Error("jarvis-server não está rodando. Abra http://localhost:8080 no navegador (ou rode jarvis-server.bat/.sh) e tente de novo.");
   }
-  const res = await fetch(provider.url, {
+  const url = name === "local" ? `${localGatewayBase()}/v1/chat/completions` : provider.url;
+  const res = await fetch(url, {
     method: "POST",
     headers: provider.headers(name === "local" ? "" : state.settings.apiKey),
     body: JSON.stringify(provider.body(model, payload.messages)),
@@ -578,15 +587,19 @@ async function chatCompletions(provider, name, model, payload) {
 }
 
 async function reachableLocalGateway() {
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 1500);
-    const r = await fetch(`${GATEWAY_LOCAL}/v1/models`, { signal: ctrl.signal });
-    clearTimeout(t);
-    return r.ok;
-  } catch {
-    return false;
+  const bases = [localGatewayBase(), GATEWAY_LOCAL];
+  for (const base of bases) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 1500);
+      const r = await fetch(`${base}/v1/models`, { signal: ctrl.signal });
+      clearTimeout(t);
+      if (r.ok) return true;
+    } catch {
+      clearTimeout(t);
+    }
   }
+  return false;
 }
 
 /* ---------------- Voz ---------------- */
