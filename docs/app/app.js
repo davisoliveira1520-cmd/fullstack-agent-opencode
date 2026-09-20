@@ -36,6 +36,12 @@ function localGatewayBase() {
   return GATEWAY_LOCAL;
 }
 
+/* Página na internet (ex.: GitHub Pages) — o navegador bloqueia chamar o servidor local */
+function isPublicPage() {
+  const h = location.hostname;
+  return !(h === "localhost" || h === "127.0.0.1" || h === "[::1]") && location.protocol === "https:";
+}
+
 const PROVIDERS = {
   local: {
     url: `${GATEWAY_LOCAL}/v1/chat/completions`,
@@ -173,6 +179,8 @@ function bindEvents() {
     if (pv) openApp(pv.dataset.previewApp);
     const ln = e.target.closest("[data-link-app]");
     if (ln) copyAppLink(ln.dataset.linkApp);
+    const os = e.target.closest("[data-open-settings]");
+    if (os) openSettings();
   });
   const avBack = $("#av-back");
   if (avBack) avBack.addEventListener("click", exitAppViewer);
@@ -444,6 +452,8 @@ function renderContent(content) {
     out = out.replace(`{{{CODE_BLOCK_${i}}}}`,
       `${card}<pre><code>${codeHtml}</code></pre>${appCard}`);
   }
+  out = out.split("{{{OPEN_SETTINGS}}}")
+    .join('<button class="btn primary" style="margin:6px 0" data-open-settings>⚙ Abrir Configurações</button>');
   return out;
 }
 
@@ -674,10 +684,19 @@ async function callAI(messages) {
         throw err;
       }
     }
+    const setupHint = "{{{OPEN_SETTINGS}}}";
+    if (isPublicPage()) {
+      throw new Error(
+        "Estou numa página publicada na internet — o navegador bloqueia eu falar com o servidor " +
+        "da sua máquina (norma de segurança do navegador, CORS). " + setupHint + "\n\n" +
+        "Hoje, o caminho mais rápido: **Configurações → Provedor: OpenRouter → cole a chave** e " +
+        "mande sua mensagem de novo. Quando a ZimaBoard chegar, o zima/deploy.sh resolve tudo num link só."
+      );
+    }
     throw new Error(
-      "O Jarvis local (OpenCode/OpenClaw) não está rodando aqui.\n" +
-      "No seu PC, rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra http://localhost:8080.\n" +
-      "Dica: para usar sem precisar do servidor, escolha um provedor (ex.: OpenRouter) nas Configurações e cole a chave."
+      "O servidor local (OpenCode/OpenClaw) não está rodando nesta máquina. " + setupHint + "\n\n" +
+      "Rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra http://localhost:8080. " +
+      "Ou escolha um provedor de nuvem (ex.: OpenRouter) nas Configurações e cole a chave."
     );
   }
 
