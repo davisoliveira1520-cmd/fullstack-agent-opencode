@@ -449,7 +449,6 @@ body::after {
   border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
 }
 .modal-card small { color: var(--text-dim); font-size: 11.5px; line-height: 1.45; }
-#api-key-label.hidden { display: none; }
 #local-status { text-align: left; font-size: 12px; }
 #local-status.ok { color: var(--ok); }
 #local-status.off { color: var(--danger); }

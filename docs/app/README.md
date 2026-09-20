@@ -4,7 +4,7 @@ O **Jarvis Web** é o app web do Jarvis: um assistente pessoal que responde por 
 
 ## Como funciona (auto-suficiente)
 
-Por padrão o Jarvis Web usa o **OpenCode + OpenClaw** — nada de chave no site:
+O Jarvis Web usa o **OpenCode + OpenClaw** — **sem chave, sem conta, sem nuvem**:
 
 **Opção A — Um único link (recomendado):** o Jarvis rodando numa máquina sempre ligada (ex.: ZimaBoard) com HTTPS serve o app **e** o cérebro juntos:
 1. Na ZimaBoard: `bash zima/deploy.sh` (instala OpenClaw, Caddy/HTTPS e copia o app).
@@ -15,20 +15,16 @@ Por padrão o Jarvis Web usa o **OpenCode + OpenClaw** — nada de chave no site
 ## Como rodar
 
 - **Um link, tudo dentro (Zima/nuvem):** `bash zima/deploy.sh` e abra o domínio HTTPS. O app e o gateway vivem no mesmo endereço (sem CORS).
-- **Página publicada:** `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/` — funciona com provedores de nuvem (plano B). O modo Jarvis local via página publicada é **bloqueado pelo navegador (CORS)**; para isso use a Opção A ou B.
+- **Página publicada:** `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/` mostra a interface, mas **o cérebro só roda onde o servidor local está acessível** (Opção A ou B) — o navegador bloqueia chamadas para a sua máquina a partir de uma página publicada.
 
 ## Configuração
 
 Abra **Configurações**:
 
-| Campo | O que é | Exemplo |
-|---|---|---|
-| Provedor | `Jarvis local (OpenCode/OpenClaw)` é o padrão — sem chave | local |
-| Provedor de nuvem (opcional) | Para conversar sem ter o servidor local rodando | OpenRouter |
+- **Modelo**: nome do modelo no gateway local (deixe vazio = padrão `openclaw`).
+- **Personalidade**: descreva como o Jarvis deve se comportar.
 
-> **Sem servidor local?** O Jarvis Web tenta primeiro o gateway local. Se não estiver rodando, usa o provedor de nuvem configurado (ex.: OpenRouter) — ou avisa para você ligar o `jarvis-server`.
-
-Provedores de nuvem suportados (plano B): **OpenRouter**, **OpenAI**, **HuggingFace** (rota compatível `router.huggingface.co`). A chave fica só no `localStorage` do seu navegador.
+Nada de chave: tudo roda no OpenCode/OpenClaw local.
 
 ## Comando de voz
 

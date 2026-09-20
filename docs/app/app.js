@@ -2,21 +2,14 @@
 
 /* ============================================================
    Jarvis Web — Assistente por voz
-   - Chat com IA (OpenRouter / OpenAI / HuggingFace)
+   - Chat com IA via cérebro local (OpenCode/OpenClaw) — sem chave
    - Comando de voz via Web Speech API (SpeechRecognition + TTS)
    - Criação de apps: o Jarvis gera um HTML único que pode ser
-     baixado quando você pede algo como "crie um app de X"
+     aberto na página, compartilhado por link ou baixado
    ============================================================ */
 
 const DEFAULTS = {
-  provider: "local",
   model: "openclaw",
-  modelHelp: {
-    local: "modo local: usa o OpenClaw/OpenCode da sua máquina (sem chave)",
-    openrouter: "ex.: openai/gpt-4o-mini, anthropic/claude-3.5-sonnet, deepseek/deepseek-chat",
-    openai: "ex.: gpt-4o-mini",
-    huggingface: "ex.: Qwen/Qwen3-Coder-30B-A3B-Instruct (ou use OpenRouter)",
-  },
   // Personalidade padrão do Jarvis (voz de assistente pessoal)
   persona:
     "Você é o Jarvis, um assistente pessoal de inteligência artificial. " +
@@ -41,33 +34,6 @@ function isPublicPage() {
   const h = location.hostname;
   return !(h === "localhost" || h === "127.0.0.1" || h === "[::1]") && location.protocol === "https:";
 }
-
-const PROVIDERS = {
-  local: {
-    url: `${GATEWAY_LOCAL}/v1/chat/completions`,
-    requiresKey: false,
-    headers: () => ({ "Content-Type": "application/json" }),
-    body: (model, messages) => ({ model, messages }),
-  },
-  openrouter: {
-    url: "https://openrouter.ai/api/v1/chat/completions",
-    requiresKey: true,
-    headers: (key) => ({ Authorization: `Bearer ${key}`, "Content-Type": "application/json" }),
-    body: (model, messages) => ({ model, messages }),
-  },
-  openai: {
-    url: "https://api.openai.com/v1/chat/completions",
-    requiresKey: true,
-    headers: (key) => ({ Authorization: `Bearer ${key}`, "Content-Type": "application/json" }),
-    body: (model, messages) => ({ model, messages }),
-  },
-  huggingface: {
-    url: "https://router.huggingface.co/v1/chat/completions",
-    requiresKey: true,
-    headers: (key) => ({ Authorization: `Bearer ${key}`, "Content-Type": "application/json" }),
-    body: (model, messages) => ({ model, messages }),
-  },
-};
 
 /* ---------------- Estado ---------------- */
 const state = {
@@ -139,12 +105,11 @@ function init() {
 }
 
 async function checkLocalGateway() {
-  if ((state.settings.provider || "local") !== "local") return;
   const ok = await reachableLocalGateway();
   if (ok) {
     statusDot.className = "dot on";
     statusText.textContent = "Jarvis local conectado";
-    headerModel.textContent = "◉ OpenCode/OpenClaw local conectado";
+    headerModel.textContent = "◉ OpenCode/OpenClaw local" + (state.settings.model ? ` · ${state.settings.model}` : "");
   } else {
     statusDot.className = "dot";
     statusText.textContent = "jarvis-server não está rodando";
@@ -198,28 +163,11 @@ function bindEvents() {
       sendCurrentMessage();
     }
   });
-  $("#provider").addEventListener("change", (e) => {
-    const p = e.target.value;
-    $("#model-help").textContent = DEFAULTS.modelHelp[p] || "";
-    $("#model").placeholder = DEFAULTS.modelHelp[p] || "";
-    toggleApiKeyField(p);
-    updateLocalStatus(p);
-  });
 }
 
-function toggleApiKeyField(provider) {
-  const keyLabel = $("#api-key-label");
-  if (!keyLabel) return;
-  keyLabel.classList.toggle("hidden", provider === "local");
-}
-
-async function updateLocalStatus(provider) {
+async function updateLocalStatus() {
   const el = $("#local-status");
   if (!el) return;
-  if (provider !== "local") {
-    el.style.display = "none";
-    return;
-  }
   el.style.display = "block";
   el.className = "hint";
   el.textContent = "Verificando o servidor local…";
@@ -229,7 +177,7 @@ async function updateLocalStatus(provider) {
     el.textContent = "✓ Jarvis local (OpenCode/OpenClaw) conectado em " + localGatewayBase();
   } else {
     el.className = "hint off";
-    el.textContent = "✗ Servidor local não está rodando aqui. No seu PC, rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra http://localhost:8080. Ou use um provedor de nuvem abaixo.";
+    el.textContent = "✗ Servidor local não está alcançável. No seu PC, rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra http://localhost:8080 — sem chave.";
   }
 }
 
@@ -249,22 +197,15 @@ function toggleTheme() {
 /* ---------------- Configurações ---------------- */
 function openSettings() {
   const s = state.settings;
-  $("#provider").value = s.provider || DEFAULTS.provider;
   $("#model").value = s.model || "";
-  $("#api-key").value = s.apiKey || "";
   $("#persona").value = s.persona || DEFAULTS.persona;
-  $("#model-help").textContent = DEFAULTS.modelHelp[$("#provider").value] || "";
-  $("#model").placeholder = DEFAULTS.modelHelp[$("#provider").value] || "";
-  toggleApiKeyField($("#provider").value);
-  updateLocalStatus($("#provider").value);
+  updateLocalStatus();
   settingsModal.showModal();
 }
 
 settingsForm.addEventListener("close", () => {
   if (settingsForm.returnValue === "default") {
-    state.settings.provider = $("#provider").value;
     state.settings.model = $("#model").value.trim();
-    state.settings.apiKey = $("#api-key").value.trim();
     state.settings.persona = $("#persona").value.trim();
     saveSettings();
     applySettingsToUI();
@@ -274,15 +215,8 @@ settingsForm.addEventListener("close", () => {
 });
 
 function applySettingsToUI() {
-  const p = state.settings.provider || "local";
   const m = state.settings.model;
-  if (p === "local") {
-    headerModel.textContent = "◉ OpenCode/OpenClaw local";
-  } else if (m && p) {
-    headerModel.textContent = `${p} · ${m}`;
-  } else {
-    headerModel.textContent = "modelo não configurado";
-  }
+  headerModel.textContent = "◉ OpenCode/OpenClaw local" + (m ? ` · ${m}` : "");
 }
 
 /* ---------------- Chat ---------------- */
@@ -652,7 +586,6 @@ function showTyping() {
 /* ---------------- IA ---------------- */
 async function callAI(messages) {
   const s = state.settings;
-  let provider = PROVIDERS[s.provider] || PROVIDERS.local;
   const model = s.model || DEFAULTS.model;
   const sys = s.persona || DEFAULTS.persona;
 
@@ -668,54 +601,34 @@ async function callAI(messages) {
     stream: false,
   };
 
-  // Passo 1: tenta o gateway local (OpenClaw/OpenCode) — sem chave
-  if (provider.requiresKey === false || !s.apiKey || !PROVIDERS[s.provider]) {
-    try {
-      return await chatCompletions(PROVIDERS.local, "local", model, payload);
-    } catch (err) {
-      // gateway local fora do ar
-    }
-    // Passo 2 (fallback): nuvem, se o usuário tiver chave configurada
-    if (s.apiKey && PROVIDERS[s.provider] && PROVIDERS[s.provider].requiresKey) {
-      provider = PROVIDERS[s.provider];
-      try {
-        return await chatCompletions(provider, s.provider, model, payload);
-      } catch (err) {
-        throw err;
+  try {
+    return await chatCompletions(model, payload);
+  } catch (err) {
+    if (!(await reachableLocalGateway())) {
+      const setupHint = "{{{OPEN_SETTINGS}}}";
+      if (isPublicPage()) {
+        throw new Error(
+          "Estou numa página publicada na internet — o navegador bloqueia eu falar com o servidor " +
+          "da sua máquina (norma de segurança do navegador, CORS). " + setupHint + "\n\n" +
+          "Sem chave, para me usar agora: rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra " +
+          "http://localhost:8080 no seu PC. Quando a ZimaBoard chegar, o zima/deploy.sh resolve tudo num link só."
+        );
       }
-    }
-    const setupHint = "{{{OPEN_SETTINGS}}}";
-    if (isPublicPage()) {
       throw new Error(
-        "Estou numa página publicada na internet — o navegador bloqueia eu falar com o servidor " +
-        "da sua máquina (norma de segurança do navegador, CORS). " + setupHint + "\n\n" +
-        "Hoje, o caminho mais rápido: **Configurações → Provedor: OpenRouter → cole a chave** e " +
-        "mande sua mensagem de novo. Quando a ZimaBoard chegar, o zima/deploy.sh resolve tudo num link só."
+        "O servidor local (OpenCode/OpenClaw) não está rodando nesta máquina. " + setupHint + "\n\n" +
+        "Rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e depois abra http://localhost:8080 — sem chave."
       );
     }
-    throw new Error(
-      "O servidor local (OpenCode/OpenClaw) não está rodando nesta máquina. " + setupHint + "\n\n" +
-      "Rode jarvis-server.bat (Windows) ou ./jarvis-server.sh e abra http://localhost:8080. " +
-      "Ou escolha um provedor de nuvem (ex.: OpenRouter) nas Configurações e cole a chave."
-    );
+    throw err;
   }
-
-  // provedor de nuvem escolhido com chave
-  if (!s.apiKey) {
-    throw new Error("Configure a chave da API nas Configurações.");
-  }
-  return await chatCompletions(provider, s.provider, model, payload);
 }
 
-async function chatCompletions(provider, name, model, payload) {
-  if (name === "local" && !(await reachableLocalGateway())) {
-    throw new Error("jarvis-server não está rodando. Abra http://localhost:8080 no navegador (ou rode jarvis-server.bat/.sh) e tente de novo.");
-  }
-  const url = name === "local" ? `${localGatewayBase()}/v1/chat/completions` : provider.url;
+async function chatCompletions(model, payload) {
+  const url = `${localGatewayBase()}/v1/chat/completions`;
   const res = await fetch(url, {
     method: "POST",
-    headers: provider.headers(name === "local" ? "" : state.settings.apiKey),
-    body: JSON.stringify(provider.body(model, payload.messages)),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model, messages: payload.messages }),
   });
 
   if (!res.ok) {
@@ -724,11 +637,11 @@ async function chatCompletions(provider, name, model, payload) {
       const j = await res.json();
       msg = (j.error && (j.error.message || j.error)) || j.message || msg;
     } catch {}
-    throw new Error(`Erro da API (${res.status}): ${msg}`);
+    throw new Error(`Erro do servidor (${res.status}): ${msg}`);
   }
   const data = await res.json();
   const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-  if (!content) throw new Error("Resposta vazia da API.");
+  if (!content) throw new Error("Resposta vazia do servidor.");
   return content;
 }
 

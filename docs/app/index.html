@@ -103,25 +103,13 @@
     <form method="dialog" class="modal-card" id="settings-form">
       <h3>Configurações</h3>
 
-      <label>Provedor
-        <select id="provider">
-          <option value="local">Jarvis local (OpenCode/OpenClaw) — sem chave</option>
-          <option value="openrouter">OpenRouter</option>
-          <option value="openai">OpenAI</option>
-          <option value="huggingface">HuggingFace</option>
-        </select>
-      </label>
+      <label>Jarvis local (OpenCode/OpenClaw) — sem chave</label>
 
       <p id="local-status" class="hint" style="margin:0">Verificando o servidor local…</p>
 
       <label>Modelo
-        <input id="model" type="text" placeholder="ex.: openai/gpt-4o-mini" />
-        <small id="model-help">Ajuste conforme o provedor escolhido.</small>
-      </label>
-
-      <label id="api-key-label">Chave da API
-        <input id="api-key" type="password" placeholder="sk-…" />
-        <small>A chave fica salva só no seu navegador (localStorage).</small>
+        <input id="model" type="text" placeholder="openclaw" />
+        <small>Nome do modelo no gateway local. Deixe vazio para o padrão.</small>
       </label>
 
       <label>Personalidade
