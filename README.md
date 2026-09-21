@@ -21,7 +21,7 @@ Every piece is optional. The wizard asks which ones you want and explains each i
 
 ## Install
 
-**O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code, o OpenClaw, o Open-Lovable, o Freebuff e o OpenJarvis. Nada se instala no seu PC além de descompactar esta pasta — o próprio Jarvis cuida do resto.
+**O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code, o OpenClaw, o Open-Lovable, o Freebuff, o Hermes Agent e o OpenJarvis. Nada se instala no seu PC além de descompactar esta pasta — o próprio Jarvis cuida do resto.
 
 **Windows (PowerShell):** baixa o toolbox e abre o Jarvis no navegador. Na primeira execução, o `jarvis.bat` instala Node.js/OpenClaw automaticamente e sobe o assistente:
 
@@ -180,6 +180,23 @@ Modelos gratuitos inclusos: GLM 5.3 Flash, DeepSeek V4.1 Flash, GPT-5.6 Luna, Mi
 
 Docs: https://freebuff.com
 Licença: Apache-2.0 (ver `freebuff/LICENSE`)
+
+## Hermes Agent
+
+Em `hermes-agent/` está o **[Hermes Agent](https://github.com/nousresearch/hermes-agent)** — o agente de IA **auto-melhorativo** da Nous Research (MIT): cria skills a partir da experiência, melhora elas durante o uso, busca nas próprias conversas passadas, tem memória persistente entre sessões, cron de automações e fala com você pelo **Telegram/Discord/Slack/WhatsApp/CLI** a partir de um único gateway — inclusive rodando fora do seu PC:
+
+```bash
+# Linux/macOS/WSL2/Termux
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+
+# Windows nativo (PowerShell)
+iex (irm https://hermes-agent.nousresearch.com/install.ps1)
+```
+
+O Hermes roda **junto com o resto do Jarvis**: enquanto o OpenClaw/OpenCode atendem no gateway web e o Open-Lovable/Freebuff constroem os apps, o Hermes guarda memória de longo prazo, agenda tarefas e pode ser acionado pelo Telegram de qualquer lugar. Veja `hermes-agent/JARVIS.md` para o fluxo conjunto.
+
+Docs: https://hermes-agent.nousresearch.com/docs
+Licença: MIT (ver `hermes-agent/LICENSE`)
 
 ## Codex
 

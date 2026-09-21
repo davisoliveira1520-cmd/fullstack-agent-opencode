@@ -60,4 +60,4 @@ O resultado vem em um bloco de código com o código html. No bloco:
 
 - Para o modo Jarvis local (sem chave), use a **Opção A** (Zima/domínio HTTPS — recomendado) ou **Opção B** (`jarvis-server`, `http://localhost:8080`). A página publicada no GitHub Pages não acessa o gateway local por causa do CORS do navegador.
 - A voz é processada no próprio navegador (Web Speech API).
-- O Jarvis Web é uma interface web; os agentes de terminal (OpenCode, Claude Code, Codex, OpenClaw) continuam rodando pela CLI — veja o `README.md` na raiz deste repositório.
+- O Jarvis Web é uma interface web; os agentes de terminal (OpenCode, Claude Code, Codex, OpenClaw, Hermes Agent) continuam rodando pela CLI — veja o `README.md` na raiz deste repositório.
