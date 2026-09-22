@@ -7,6 +7,18 @@ e o cérebro (OpenClaw/OpenCode) rodem juntos, atrás de um **único link HTTPS*
 - o **gateway** (OpenClaw/OpenCode) roda no mesmo domínio, proxied pelo Caddy
 - PC, celular, qualquer dispositivo: **só abrir o link — nada instalado**
 
+## Arquitetura do cluster (pessoa → Jarvis → placas → resposta)
+
+Você **instala o projeto na Placa 1**, e as 4 dividem a força (mestre/worker):
+
+- **Placa 1 = mestre/servidor**: OpenClaw (cérebro) + webapp + HTTPS. É a única porta de
+  entrada — recebe o pedido, decide onde trabalhar e responde a pessoa.
+- **Placas 2–4 = workers**: executam o trabalho pesado e devolvem o resultado ao mestre
+  (via SSH pelos nomes `zima-apps`, `zima-memoria`, `zima-codigo`).
+
+Fluxo: `pessoa fala no link → Placa 1 entende → despacha → Placa 2 cria/Placa 4 codeja/
+Placa 3 lembra → resposta volta → Jarvis responde`. Detalhes e comandos: **`zima/CLUSTER.md`**.
+
 ## Com 4 placas (recomendado)
 
 Sim, dá pra usar as ZimaBoards como **seus servidores**. Cada placa tem um papel; rode em
