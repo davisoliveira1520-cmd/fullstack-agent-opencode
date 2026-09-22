@@ -7,6 +7,38 @@ e o cérebro (OpenClaw/OpenCode) rodem juntos, atrás de um **único link HTTPS*
 - o **gateway** (OpenClaw/OpenCode) roda no mesmo domínio, proxied pelo Caddy
 - PC, celular, qualquer dispositivo: **só abrir o link — nada instalado**
 
+## Com 4 placas (recomendado)
+
+Sim, dá pra usar as ZimaBoards como **seus servidores**. Cada placa tem um papel; rode em
+**cada uma** o deploy do papel dela — é idempotente (repetir é seguro):
+
+```bash
+Placa 1  bash zima/deploy-multi.sh cerebro   # cérebro + link único HTTPS (roda o deploy.sh)
+Placa 2  bash zima/deploy-multi.sh apps      # Open-Lovable + Freebuff (cria e termina apps)
+Placa 3  bash zima/deploy-multi.sh memoria   # Hermes Agent (memória, skills, Telegram/Discord)
+Placa 4  bash zima/deploy-multi.sh codigo    # Codex + Claude Code (agentes de terminal)
+```
+
+```bash
+Placa única (8 GB+)  bash zima/deploy-multi.sh tudo   # tudo dentro de uma placa só
+```
+
+| Papel        | RAM mínima | O que instala                                       |
+|--------------|-----------|-----------------------------------------------------|
+| `cerebro`    | 4 GB      | Node, OpenClaw/OpenCode, Caddy/HTTPS, webapp        |
+| `apps`       | 4 GB      | Node, Open-Lovable, Freebuff                        |
+| `memoria`    | 8 GB      | Hermes Agent (gateway de mensagens, memória, cron)  |
+| `codigo`     | 4 GB      | Node, Codex, Claude Code                            |
+| `tudo`       | 8 GB+     | todos os anteriores numa placa só                   |
+
+Dicas:
+
+- O acesso público entra pela **placa 1** (DNS → IP da casa + port-forward 80/443).
+  As outras placas podem ficar só na rede local.
+- Placas de 8 GB para `cerebro` e `memoria` (Hermes em Python é o mais pesado).
+- Nada de modelo local: as placas chamam APIs na nuvem; CPU fraca é suficiente.
+  Para LLM local, só com GPU de verdade.
+
 ## Como usar
 
 1. Clone o repositório na ZimaBoard:

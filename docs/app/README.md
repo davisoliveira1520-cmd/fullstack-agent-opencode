@@ -7,7 +7,7 @@ O **Jarvis Web** é o app web do Jarvis: um assistente pessoal que responde por 
 O Jarvis Web usa o **OpenCode + OpenClaw** — **sem chave, sem conta, sem nuvem**:
 
 **Opção A — Um único link (recomendado):** o Jarvis rodando numa máquina sempre ligada (ex.: ZimaBoard) com HTTPS serve o app **e** o cérebro juntos:
-1. Na ZimaBoard: `bash zima/deploy.sh` (instala OpenClaw, Caddy/HTTPS e copia o app).
+1. Na ZimaBoard: `bash zima/deploy.sh` (instala OpenClaw, Caddy/HTTPS e copia o app). Com 4 placas, use `bash zima/deploy-multi.sh <cerebro|apps|memoria|codigo|tudo>` — cada placa vira um servidor (ver `zima/README.md`).
 2. Pronto: um único link `https://jarvis.seudominio` funciona no PC, na internet e no celular — **sem instalar nada em nenhum aparelho**.
 
 **Opção B — Só na sua máquina:** duplo-clique em `jarvis.bat` (Windows) e pronto — ele instala Node/OpenClaw na primeira vez e **abre o Jarvis no navegador automaticamente**, sem digitar endereço. (Alternativa manual: `jarvis-server.bat` / `./jarvis-server.sh` e acessar `http://localhost:8080`.)
