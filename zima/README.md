@@ -23,6 +23,34 @@ Placa 4  bash zima/deploy-multi.sh codigo    # Codex + Claude Code (agentes de t
 Placa única (8 GB+)  bash zima/deploy-multi.sh tudo   # tudo dentro de uma placa só
 ```
 
+### Cluster de um comando só (`zima/cluster.sh`)
+
+Do **seu PC** (Git Bash/WSL/Linux), sem entrar em cada placa: o script baixa o repo
+em cada placa, define os nomes da rede (`zima-cerebro`, `zima-apps`, `zima-memoria`,
+`zima-codigo` no `/etc/hosts` de todas) e roda o deploy do papel certo onde precisa:
+
+```bash
+# 0) uma vez por placa: copie sua chave SSH (senha so na primeira vez)
+ssh-copy-id zima1@10.0.0.10        # (repita para os outros IPs)
+
+# 1) configurar o cluster (pergunta os IPs, users, domínio) — gera zima/cluster.env
+bash zima/cluster.sh init
+
+# 2) baixar + instalar tudo em todas as placas (a primeira vez demora)
+bash zima/cluster.sh deploy
+
+# 3) ver a saúde de todas: RAM, serviços (jarvis-gateway/caddy/hermes-gateway), nomes
+bash zima/cluster.sh status
+
+# extras
+bash zima/cluster.sh logs cerebro    # acompanhar logs do papel em tempo real
+bash zima/cluster.sh cmd codigo "codex exec \"me ajude no projeto\""  # comando livre
+```
+
+Depois de instalado, o acesso de fora continua entrando só pela **placa 1**:
+registro **A** do domínio → IP público, port-forward **80/443** no roteador.
+As placas 2–4 ficam só na rede local, comandadas pela `cmd`/SSH.
+
 | Papel        | RAM mínima | O que instala                                       |
 |--------------|-----------|-----------------------------------------------------|
 | `cerebro`    | 4 GB      | Node, OpenClaw/OpenCode, Caddy/HTTPS, webapp        |
