@@ -6,16 +6,17 @@ O **Jarvis Web** é o app web do Jarvis: um assistente pessoal que responde por 
 
 O Jarvis Web usa o **OpenCode + OpenClaw** — **sem chave, sem conta, sem nuvem**:
 
-**Opção A — Um único link (recomendado):** o Jarvis rodando numa máquina sempre ligada (ex.: ZimaBoard) com HTTPS serve o app **e** o cérebro juntos:
-1. Na ZimaBoard: `bash zima/deploy.sh` (instala OpenClaw, Caddy/HTTPS e copia o app). Com 4 placas, use `bash zima/deploy-multi.sh <cerebro|apps|memoria|codigo|tudo>` — cada placa vira um servidor (ver `zima/README.md`).
-2. Pronto: um único link `https://jarvis.seudominio` funciona no PC, na internet e no celular — **sem instalar nada em nenhum aparelho**.
+**Opção B — na sua máquina (principal):** o Jarvis roda **na máquina da pessoa**. No Windows, duplo-clique em `jarvis.bat` (instala Node/OpenClaw na primeira vez, se faltar) e ele **abre o navegador automaticamente** — sem digitar endereço. O cérebro é o OpenCode/OpenClaw da própria máquina; tudo roda local, sem chave. (Alternativa manual: `jarvis-server.bat` / `./jarvis-server.sh` e acessar `http://localhost:8080`.)
 
-**Opção B — Só na sua máquina:** duplo-clique em `jarvis.bat` (Windows) e pronto — ele instala Node/OpenClaw na primeira vez e **abre o Jarvis no navegador automaticamente**, sem digitar endereço. (Alternativa manual: `jarvis-server.bat` / `./jarvis-server.sh` e acessar `http://localhost:8080`.)
+**Opção A — um único link (opcional):** quer acessar o Jarvis de qualquer lugar (PC, celular, internet) **sem instalar nada em nenhum aparelho**? Suba ele numa máquina sempre ligada (ex.: ZimaBoard) com HTTPS:
+1. Na ZimaBoard: `bash zima/deploy.sh` (instala OpenClaw, Caddy/HTTPS e copia o app — ver `zima/README.md`).
+2. Pronto: um único link `https://jarvis.seudominio` funciona no PC, na internet e no celular.
 
 ## Como rodar
 
-- **Um link, tudo dentro (Zima/nuvem):** `bash zima/deploy.sh` e abra o domínio HTTPS. O app e o gateway vivem no mesmo endereço (sem CORS).
-- **Página publicada:** `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/` mostra a interface, mas **o cérebro só roda onde o servidor local está acessível** (Opção A ou B) — o navegador bloqueia chamadas para a sua máquina a partir de uma página publicada.
+- **Local (padrão):** `jarvis.bat` ou `jarvis-server.bat` / `./jarvis-server.sh` — acesse `http://localhost:8080`. O OpenCode/OpenClaw da própria máquina é o cérebro.
+- **Link único (opcional):** `bash zima/deploy.sh` numa ZimaBoard e abra o domínio HTTPS. O app e o gateway vivem no mesmo endereço (sem CORS).
+- **Página publicada:** `https://davisoliveira1520-cmd.github.io/fullstack-agent-opencode/app/` mostra a interface, mas **o cérebro só roda onde o servidor local (ou o link da Opção A) está acessível** — o navegador bloqueia chamadas para a sua máquina a partir de uma página publicada.
 
 ## Configuração
 
@@ -58,6 +59,6 @@ O resultado vem em um bloco de código com o código html. No bloco:
 
 ## Limitações conhecidas
 
-- Para o modo Jarvis local (sem chave), use a **Opção A** (Zima/domínio HTTPS — recomendado) ou **Opção B** (`jarvis-server`, `http://localhost:8080`). A página publicada no GitHub Pages não acessa o gateway local por causa do CORS do navegador.
+- Para o modo Jarvis local (sem chave), use a **Opção B** (máquina da pessoa, `jarvis-server`, `http://localhost:8080` — a principal) ou a **Opção A** (Zima/domínio HTTPS — opcional). A página publicada no GitHub Pages não acessa o gateway local por causa do CORS do navegador.
 - A voz é processada no próprio navegador (Web Speech API).
 - O Jarvis Web é uma interface web; os agentes de terminal (OpenCode, Claude Code, Codex, OpenClaw) continuam rodando pela CLI — veja o `README.md` na raiz deste repositório.
