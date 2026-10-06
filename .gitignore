@@ -17,3 +17,9 @@ tmp/
 # Release artifact (built locally, uploaded to GitHub Releases)
 packaging/jarvis.zip
 packaging/jarvis/
+
+# Ferramentas removidas do projeto (estao no historico do git, nao devem voltar)
+/freebuff/
+/open-lovable/
+/hermes-agent/
+/openjarvis/

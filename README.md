@@ -123,6 +123,24 @@ openclaw dashboard
 
 Docs, modelos, skills e plugins: https://docs.openclaw.ai
 
+### OpenClaw via Docker (opcional)
+
+Quer isolar o OpenClaw em container (imagem oficial) em vez de instalar direto na máquina?
+
+```bash
+cd openclaw
+export OPENCLAW_IMAGE="openclaw/openclaw:latest"   # ou ghcr.io/openclaw/openclaw:latest
+./scripts/docker/setup.sh                          # monta e sobe com docker compose
+```
+
+**Atenção:** o gateway usa bind `loopback` por padrão — dentro do container ele não
+responde com `-p 18789:18789`; use `--network host` ou configure `gateway.bind: "lan"`
+(detalhes em `openclaw/docs/install/docker.md` e `openclaw/docs/gateway/config-gateway.md`).
+
+Docker é só alternativa: **o padrão do projeto é OpenClaw direto na máquina (npm)**.
+O `jarvis.bat` (PC) e o `zima/deploy.sh` (servidor) já instalam e sobem sozinhos — o modo
+Docker vale pra setup manual avançado.
+
 ## Claude Code
 
 Em `claude-code/` está o **[Claude Code](https://github.com/anthropics/claude-code)** — o agente de codificação da Anthropic (terminal):
