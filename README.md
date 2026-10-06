@@ -21,7 +21,7 @@ Every piece is optional. The wizard asks which ones you want and explains each i
 
 ## Install
 
-**O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code, o OpenClaw, o Open-Lovable, o Freebuff, o Hermes Agent e o OpenJarvis. Nada se instala no seu PC além de descompactar esta pasta — o próprio Jarvis cuida do resto.
+**O Jarvis já vem completo.** Este repositório tem tudo dentro: o OpenCode (binário embutido), o Claude Code e o OpenClaw. Você só precisa ter o **OpenCode instalado na sua máquina** — o próprio Jarvis cuida do resto.
 
 **Windows (PowerShell):** baixa o toolbox e abre o Jarvis no navegador. Na primeira execução, o `jarvis.bat` instala Node.js/OpenClaw automaticamente e sobe o assistente:
 
@@ -110,18 +110,6 @@ Then you're exactly who this was designed around. If you set up a memory vault, 
 
 Built on the free and open work of **Jared Rhodenizer** ([jaredrhod/fullstack-agent](https://github.com/jaredrhod/fullstack-agent)), adapted to run on **OpenCode** ([anomalyco/opencode](https://github.com/anomalyco/opencode)) in place of Claude Code. Community, videos, and Discord: https://jaredrhod.com
 
-## OpenJarvis
-
-Em `openjarvis/` está o **[OpenJarvis](https://github.com/open-jarvis/OpenJarvis)** (Stanford / Hazy Research) — framework Python para IA pessoal local-first, Apache 2.0:
-
-```bash
-jarvis                          # start chatting
-jarvis init --preset <name> --force
-jarvis doctor                   # status
-```
-
-Skills, agentes built-in (morning_digest, deep_research, orchestrator, code-assistant etc.), docs e tutoriais: https://open-jarvis.github.io/OpenJarvis/
-
 ## OpenClaw
 
 Em `openclaw/` está o **[OpenClaw](https://github.com/openclaw/openclaw)** — assistente de IA open-source que roda na sua máquina e atende nos canais que você já usa (Discord, iMessage, Slack, Teams, Telegram, WhatsApp, +20), com apps nativos e Gateway local (MIT):
@@ -146,57 +134,6 @@ claude
 
 USO: https://docs.anthropic.com/en/docs/claude-code
 Politica comercial / licença: https://www.anthropic.com/legal/commercial-terms
-
-## Open-Lovable
-
-Em `open-lovable/` está o **[Open-Lovable](https://github.com/firecrawl/open-lovable)** — uma recriação open-source do Lovable: crie, clone e recrie apps com IA a partir de uma conversa (copie um site existente e faça o Jarvis reconstruí-lo):
-
-```bash
-npm install
-npm run dev        # web UI (assistente de apps)
-```
-
-Pergunte ao Jarvis (falando): "crie um app com a cópia do Lovable" — ele usa esta pasta para gerar a aplicação.
-
-## Freebuff
-
-Em `freebuff/` está o **[Freebuff](https://github.com/CodebuffAI/freebuff)** — o agente de codificação gratuito (Apache-2.0): **5 produtos de IA gratuitos** (CLI, Web, Cloud, Desktop e Chat) para codificar, construir e pesquisar — **sem assinatura, sem créditos e sem chave de API** (modelos incluídos, com anúncios em texto):
-
-```bash
-npm install -g freebuff
-freebuff           # CLI: descreva o que quer e ele edita, roda e revisa
-```
-
-O Freebuff roda **junto com o Open-Lovable**: enquanto o Open-Lovable gera o app a partir da conversa (web UI), o Freebuff codeja/melhora o projeto no terminal usando os modelos grátis inclusos. Veja `freebuff/JARVIS.md` para o fluxo conjunto.
-
-Integração no Jarvis:
-
-```bash
-cd freebuff && npm install -g .   # instala o CLI local
-freebuff                         # no diretório do app gerado pelo Open-Lovable
-```
-
-Modelos gratuitos inclusos: GLM 5.3 Flash, DeepSeek V4.1 Flash, GPT-5.6 Luna, MiMo 2.5, Solar Pro 4 e Muse Spark 1.2.
-
-Docs: https://freebuff.com
-Licença: Apache-2.0 (ver `freebuff/LICENSE`)
-
-## Hermes Agent
-
-Em `hermes-agent/` está o **[Hermes Agent](https://github.com/nousresearch/hermes-agent)** — o agente de IA **auto-melhorativo** da Nous Research (MIT): cria skills a partir da experiência, melhora elas durante o uso, busca nas próprias conversas passadas, tem memória persistente entre sessões, cron de automações e fala com você pelo **Telegram/Discord/Slack/WhatsApp/CLI** a partir de um único gateway — inclusive rodando fora do seu PC:
-
-```bash
-# Linux/macOS/WSL2/Termux
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
-
-# Windows nativo (PowerShell)
-iex (irm https://hermes-agent.nousresearch.com/install.ps1)
-```
-
-O Hermes roda **junto com o resto do Jarvis**: enquanto o OpenClaw/OpenCode atendem no gateway web e o Open-Lovable/Freebuff constroem os apps, o Hermes guarda memória de longo prazo, agenda tarefas e pode ser acionado pelo Telegram de qualquer lugar. Veja `hermes-agent/JARVIS.md` para o fluxo conjunto.
-
-Docs: https://hermes-agent.nousresearch.com/docs
-Licença: MIT (ver `hermes-agent/LICENSE`)
 
 ## Codex
 

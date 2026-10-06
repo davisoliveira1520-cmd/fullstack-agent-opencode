@@ -9,7 +9,26 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_DIR = path.join(__dirname, "docs", "app");
 const GATEWAY_PORT = Number(process.env.JARVIS_GATEWAY_PORT || 18789);
 const WEB_PORT = Number(process.env.JARVIS_WEB_PORT || 8080);
+const WEB_BIND = process.env.JARVIS_BIND || "127.0.0.1";
+const API_TOKEN = process.env.JARVIS_API_TOKEN || "";
+const CORS_ORIGIN = process.env.JARVIS_CORS_ORIGIN || "*";
 const GATEWAY_URL = `http://127.0.0.1:${GATEWAY_PORT}`;
+
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": CORS_ORIGIN,
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+function withCORS(head) {
+  return { ...CORS_HEADERS, ...head };
+}
+
+function authOk(req) {
+  if (!API_TOKEN) return true;
+  const auth = req.headers.authorization || "";
+  return auth === `Bearer ${API_TOKEN}`;
+}
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -82,7 +101,7 @@ async function serveStatic(req, res, pathname) {
   }
 
   if (!filePath.startsWith(APP_DIR)) {
-    res.writeHead(403);
+    res.writeHead(403, withCORS({ "Content-Type": "text/plain; charset=utf-8" }));
     res.end("Forbidden");
     return;
   }
@@ -94,13 +113,13 @@ async function serveStatic(req, res, pathname) {
     }
     const data = await readFile(filePath);
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, {
+    res.writeHead(200, withCORS({
       "Content-Type": MIME[ext] || "application/octet-stream",
       "Cache-Control": "no-cache",
-    });
+    }));
     res.end(data);
   } catch {
-    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    res.writeHead(404, withCORS({ "Content-Type": "text/plain; charset=utf-8" }));
     res.end("404 Not Found");
   }
 }
@@ -119,15 +138,15 @@ function proxyGateway(req, res) {
       body: bodyChunks.length ? Buffer.concat(bodyChunks) : undefined,
     })
       .then(async (up) => {
-        res.writeHead(up.status, {
+        res.writeHead(up.status, withCORS({
           "Content-Type": up.headers.get("content-type") || "application/json",
-        });
+        }));
         const buf = Buffer.from(await up.arrayBuffer());
         res.end(buf);
       })
       .catch((err) => {
         log("Proxy error: " + err.message);
-        res.writeHead(502, { "Content-Type": "application/json; charset=utf-8" });
+        res.writeHead(502, withCORS({ "Content-Type": "application/json; charset=utf-8" }));
         res.end(JSON.stringify({ error: { message: "gateway local indisponível" } }));
       });
   });
@@ -135,7 +154,17 @@ function proxyGateway(req, res) {
 
 const server = createServer((req, res) => {
   const pathname = decodeURIComponent(new URL(req.url, `http://${req.headers.host}`).pathname);
+  if (req.method === "OPTIONS") {
+    res.writeHead(204, CORS_HEADERS);
+    res.end();
+    return;
+  }
   if (pathname.startsWith("/v1/")) {
+    if (!authOk(req)) {
+      res.writeHead(401, withCORS({ "Content-Type": "application/json; charset=utf-8" }));
+      res.end(JSON.stringify({ error: { message: "token inválido ou ausente" } }));
+      return;
+    }
     proxyGateway(req, res);
   } else {
     serveStatic(req, res, pathname);
@@ -155,11 +184,14 @@ function openBrowser(url) {
 
 async function main() {
   startGateway();
-  server.listen(WEB_PORT, "127.0.0.1", () => {
-    log(`Jarvis Web rodando em http://localhost:${WEB_PORT}`);
+  server.listen(WEB_PORT, WEB_BIND, () => {
+    log(`Jarvis Web rodando em http://${WEB_BIND}:${WEB_PORT}`);
     log(`Gateway local (OpenClaw/OpenCode): ${GATEWAY_URL}`);
-    log(`Abrindo o navegador... (a janela desta etapa fica aberta; Ctrl+C encerra).`);
-    setTimeout(() => openBrowser(`http://localhost:${WEB_PORT}`), 1000);
+    log(API_TOKEN ? "Auth habilitada (Bearer token)." : "AVISO: sem JARVIS_API_TOKEN, API aberta.");
+    if (WEB_BIND === "127.0.0.1") {
+      log(`Abrindo o navegador... (a janela desta etapa fica aberta; Ctrl+C encerra).`);
+      setTimeout(() => openBrowser(`http://localhost:${WEB_PORT}`), 1000);
+    }
   });
   waitForGateway();
 }
