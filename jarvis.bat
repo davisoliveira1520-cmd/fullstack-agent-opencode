@@ -61,6 +61,25 @@ if errorlevel 1 (
   )
 )
 
+REM ---- 3) Claude Code + Codex (opcionais, tambem na maquina da pessoa) ----
+set "PATH=%PATH%;%APPDATA%\npm"
+where claude >nul 2>nul
+if errorlevel 1 (
+  echo  Claude Code nao encontrado. Instalando automaticamente (uma vez)...
+  call npm install -g @anthropic-ai/claude-code
+  if errorlevel 1 (
+    echo  [aviso] Nao consegui instalar o Claude Code (rode depois: npm install -g @anthropic-ai/claude-code)
+  )
+)
+where codex >nul 2>nul
+if errorlevel 1 (
+  echo  Codex nao encontrado. Instalando automaticamente (uma vez)...
+  call npm install -g @openai/codex
+  if errorlevel 1 (
+    echo  [aviso] Nao consegui instalar o Codex (rode depois: npm install -g @openai/codex)
+  )
+)
+
 echo  Cerebro e servidor prontos. Abrindo o Jarvis no navegador...
 echo  (Mantenha esta janela aberta enquanto usar. Ctrl+C fecha tudo.)
 echo.
