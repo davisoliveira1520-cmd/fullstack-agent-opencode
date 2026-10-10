@@ -150,6 +150,9 @@ npm install -g @anthropic-ai/claude-code
 claude
 ```
 
+Instala na máquina da pessoa (via npm) e roda no terminal da própria máquina.
+**Precisa de conta/login Anthropic** (diferente do OpenCode/OpenClaw, que são sem chave).
+
 USO: https://docs.anthropic.com/en/docs/claude-code
 Politica comercial / licença: https://www.anthropic.com/legal/commercial-terms
 
@@ -163,6 +166,9 @@ codex          # TUI com chat e supervisor
 codex exec     # modo CLI/automação
 codex --voice  # entrada por fala (requer microfone)
 ```
+
+Instala na máquina da pessoa (via npm) e roda no terminal da própria máquina.
+**Precisa de conta/login OpenAI** (diferente do OpenCode/OpenClaw, que são sem chave).
 
 USO: https://developers.openai.com/codex/
 Licença: Apache-2.0 (ver `codex/LICENSE`)
