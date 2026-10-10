@@ -173,6 +173,23 @@ Instala na máquina da pessoa (via npm — o `jarvis.bat` instala na 1ª execuç
 USO: https://developers.openai.com/codex/
 Licença: Apache-2.0 (ver `codex/LICENSE`)
 
+## Gerenciador de motores (Python)
+
+Em `python/engines/` está um **Engine Manager** que conecta os 3 motores com
+detecção automática, fallback e colaboração:
+
+- **1 motor** → executa solo; **2 motores** → peer review (rascunho + revisão);
+  **3 motores** → Claude/Codex propõem em paralelo e o OpenCode orquestra a síntese.
+- Motor que falha é **isolado temporariamente** e o fluxo migra para os restantes.
+- Detecção: CLI instalada (ou credencial `ANTHROPIC_API_KEY`/`OPENAI_API_KEY`).
+
+```bash
+cd python && python -m engines.cli --detect
+cd python && python -m engines.cli --run "crie um app de lista de tarefas"
+```
+
+Detalhes: `python/engines/README.md`.
+
 ## License
 
 Copyright (c) 2026 Jared Rhodenizer. Licensed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later), which this adaptation also carries.
